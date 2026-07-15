@@ -1,0 +1,17 @@
+{
+  "name": "RetailSite Madrid — Expansión de Supermercados",
+  "short_name": "RetailSite Madrid",
+  "description": "Análisis de expansión de supermercados en la Comunidad de Madrid: huecos de mercado, saturación y viabilidad",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8fafc",
+  "theme_color": "#16a34a",
+  "lang": "es",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

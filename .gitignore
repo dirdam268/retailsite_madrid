@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+*.log
+.vscode/
+.idea/
+
+# Fuente en claro (NO publicar) y datos sin cifrar
+index-src.html
+data/
