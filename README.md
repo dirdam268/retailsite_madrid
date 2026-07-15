@@ -16,6 +16,20 @@ Abrir `http://localhost:8000` en el navegador.
 
 No hace falta build ni instalación — vanilla JS + Leaflet + Chart.js desde CDN.
 
+## Seguridad / contraseña
+
+La app se sirve **cifrada**: `index.html` es una pantalla de acceso que descifra la app (AES-256, Web Crypto) solo con la contraseña correcta. Los datos nunca están en claro en el sitio público.
+
+**Para editar la app:**
+1. Editar **`index-src.html`** (la fuente en claro). NUNCA editar `index.html` a mano.
+2. Regenerar el `index.html` cifrado:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File build-secure.ps1 -Password 'LA_CONTRASEÑA'
+   ```
+3. `git add -A && git commit && git push`
+
+`index-src.html` está en `.gitignore` — no se sube. Guárdalo tú a buen recaudo: es la única copia en claro.
+
 ## App instalable (PWA)
 
 La app es una PWA: se puede instalar en el móvil (Android/iOS, "Añadir a pantalla de inicio") y en el ordenador (Chrome/Edge, icono de instalar en la barra de direcciones). Funciona offline tras la primera carga gracias a `sw.js`.
@@ -29,7 +43,9 @@ La app es una PWA: se puede instalar en el móvil (Android/iOS, "Añadir a panta
 
 ```
 retailsite_madrid/
-├── index.html              # App completa (single file)
+├── index-src.html          # FUENTE editable en claro (NO se publica, gitignored)
+├── build-secure.ps1        # Cifra index-src.html -> index.html con contraseña
+├── index.html              # GENERADO: pantalla de acceso + app cifrada (AES-256)
 ├── manifest.json           # Metadatos PWA (nombre, iconos, color)
 ├── sw.js                   # Service worker (caché offline)
 ├── serve.ps1               # Servidor estático local (PowerShell, sin dependencias)
