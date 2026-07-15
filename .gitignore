@@ -7,3 +7,4 @@ node_modules/
 # Fuente en claro (NO publicar) y datos sin cifrar
 index-src.html
 data/
+secciones_madrid.json

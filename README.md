@@ -16,6 +16,16 @@ Abrir `http://localhost:8000` en el navegador.
 
 No hace falta build ni instalación — vanilla JS + Leaflet + Chart.js desde CDN.
 
+## Hueco especial (negro)
+
+Además de los 5 huecos verdes, en cada distrito/municipio se busca **un "hueco especial"** (marcador negro) que cumpla criterios de población por tiempo de coche:
+
+- Zona 3 min: sin competencia ≥3.000 hab · con competencia ≥4.000 hab
+- Zona 5 min: sin competencia ≥6.000 (distrito) / 5.000 (municipio) hab · con competencia ≥8.000 (distrito) / 6.000 (municipio) hab
+- Se prioriza el hueco **sin competencia** (la oportunidad real). Si no cumple ninguno, no se marca.
+
+Los tiempos 3/5 min se **aproximan por radio** (no isócronas reales): distrito 900 m / 1,6 km; municipio 1,5 km / 2,6 km. La población es **real**: INE Censo Anual 2023 por sección censal (4.417 secciones de la CAM, geometría INE 2019, unidas por CUSEC; cubre ~97% de la población). Datos embebidos y cifrados en `SECCIONES` dentro de `index-src.html`.
+
 ## Seguridad / contraseña
 
 La app se sirve **cifrada**: `index.html` es una pantalla de acceso que descifra la app (AES-256, Web Crypto) solo con la contraseña correcta. Los datos nunca están en claro en el sitio público.
