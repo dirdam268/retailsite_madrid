@@ -26,6 +26,18 @@ Además de los 5 huecos verdes, en cada distrito/municipio se busca **un "hueco 
 
 Los tiempos 3/5 min se **aproximan por radio** (no isócronas reales): distrito 900 m / 1,6 km; municipio 1,5 km / 2,6 km. La población es **real**: INE Censo Anual 2023 por sección censal (4.417 secciones de la CAM, geometría INE 2019, unidas por CUSEC; cubre ~97% de la población). Datos embebidos y cifrados en `SECCIONES` dentro de `index-src.html`.
 
+## Municipios sin supermercado (lista)
+
+Filtro **"🚫 Sin súper"** (pestaña Municipios): lista los municipios sin ningún supermercado real (solo tiendas pequeñas o sin datos), ordenados por población. Distingue con honestidad:
+- **Sin súper (confirmado)**: el censo tiene el dato y solo hay tienda pequeña (p. ej. Quijorna, Valdilecha, Villamantilla).
+- **Sin datos**: municipios sin datos en el censo 2024 (probable hueco, sin confirmar).
+
+## Aperturas manuales (fuera del censo)
+
+`const MANUAL_STORES` en `index-src.html` permite añadir aperturas nuevas que aún no están en el censo 2024 (`origen:"manual"`, con año de apertura). Se fusionan con el censo al iniciar: cuentan como competencia, m² y quitan al municipio de la lista "sin súper" si procede. Ejemplo incluido: **Eroski en El Vellón (2025, 300 m², ubicación aproximada)**.
+
+Para nuevas aperturas: añadir la entrada a `MANUAL_STORES` (enseña, `ensena_key`, dom, cp, m², apertura, lat, lon) y reconstruir con `build-secure.ps1`. OpenStreetMap suele ir con retraso en aperturas muy recientes, así que lo manual es lo fiable.
+
 ## Seguridad / contraseña
 
 La app se sirve **cifrada**: `index.html` es una pantalla de acceso que descifra la app (AES-256, Web Crypto) solo con la contraseña correcta. Los datos nunca están en claro en el sitio público.
