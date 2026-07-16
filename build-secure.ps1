@@ -100,9 +100,11 @@ async function enter() {
   btn.disabled = true; err.textContent = 'Descifrando…';
   try {
     const html = await decryptApp(pw);
-    sessionStorage.setItem('rsm_pw', pw);
+    // Recordar en este dispositivo: solo se pide la primera vez
+    try { localStorage.setItem('rsm_pw', pw); } catch(_) {}
     document.open(); document.write(html); document.close();
   } catch (e) {
+    try { localStorage.removeItem('rsm_pw'); } catch(_) {}
     err.textContent = 'Contraseña incorrecta.';
     btn.disabled = false;
   }
@@ -111,9 +113,10 @@ async function enter() {
 document.getElementById('go').addEventListener('click', enter);
 document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') enter(); });
 
-// Si ya se validó en esta sesión, entrar directo
-if (sessionStorage.getItem('rsm_pw')) {
-  document.getElementById('pw').value = sessionStorage.getItem('rsm_pw');
+// Si ya se validó antes en este dispositivo, entrar directo sin preguntar
+const saved = (() => { try { return localStorage.getItem('rsm_pw'); } catch(_) { return null; } })();
+if (saved) {
+  document.getElementById('pw').value = saved;
   enter();
 }
 

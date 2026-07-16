@@ -34,13 +34,17 @@ Filtro **"🚫 Sin súper"** (pestaña Municipios): lista los municipios sin nin
 
 ## Aperturas manuales (fuera del censo)
 
-`const MANUAL_STORES` en `index-src.html` permite añadir aperturas nuevas que aún no están en el censo 2024 (`origen:"manual"`, con año de apertura). Se fusionan con el censo al iniciar: cuentan como competencia, m² y quitan al municipio de la lista "sin súper" si procede. Ejemplo incluido: **Eroski en El Vellón (2025, 300 m², ubicación aproximada)**.
+`const MANUAL_STORES` en `index-src.html` permite añadir aperturas nuevas que aún no están en el censo 2024 (`origen:"manual"`, con año de apertura). Se fusionan con el censo al iniciar: cuentan como competencia y m², y quitan al municipio de la lista "sin súper" si procede. En el mapa se marcan con la nota "📌 Apertura reciente (fuera del censo 2024)".
+
+Fuente de aperturas: **revistainforetail.com** (alimentación, CAM). Incluidas: Eroski City El Vellón (Abarejo 1, 305 m², 2026) · Lidl Navalcarnero (Constitución 154, 1.520 m², 2025) · Lidl Getafe (Carpinteros 1C, 1.500 m², 2026) · Ahorramás Parla (Avda. Estrellas 47, 1.190 m², 2025) · BM Chamberí (Galileo 25, 900 m², 2026). Pendientes de coordenadas: Carrefour City Plaza Elíptica, Carrefour Express Márquez 44 y Antonio López 193; Aldi Leganés/Las Rozas sin dirección publicada.
 
 Para nuevas aperturas: añadir la entrada a `MANUAL_STORES` (enseña, `ensena_key`, dom, cp, m², apertura, lat, lon) y reconstruir con `build-secure.ps1`. OpenStreetMap suele ir con retraso en aperturas muy recientes, así que lo manual es lo fiable.
 
 ## Seguridad / contraseña
 
 La app se sirve **cifrada**: `index.html` es una pantalla de acceso que descifra la app (AES-256, Web Crypto) solo con la contraseña correcta. Los datos nunca están en claro en el sitio público.
+
+La contraseña **solo se pide la primera vez** en cada dispositivo: tras una entrada correcta queda recordada (localStorage) y las siguientes veces entra directo. Si se introduce mal, se olvida y vuelve a pedirla. Nota: cualquiera con acceso físico al dispositivo desbloqueado podrá abrir la app.
 
 **Para editar la app:**
 1. Editar **`index-src.html`** (la fuente en claro). NUNCA editar `index.html` a mano.
