@@ -40,6 +40,10 @@ Fuente de aperturas: **revistainforetail.com** (alimentación, CAM). Incluidas: 
 
 Para nuevas aperturas: añadir la entrada a `MANUAL_STORES` (enseña, `ensena_key`, dom, cp, m², apertura, lat, lon) y reconstruir con `build-secure.ps1`. OpenStreetMap suele ir con retraso en aperturas muy recientes, así que lo manual es lo fiable.
 
+## Renta por sección en el score
+
+El componente de renta del score (renta inversa, 10%) usa la **renta real por persona del entorno de 2 km** de cada zona (`computeRentaEntorno`, media ponderada por población de las secciones INE ADRH 2023), en vez del agregado por hogar del municipio. Zonas rurales (secciones muy grandes sin centroide en 2 km) caen a la sección con renta más cercana. Ambas rentas (por hogar agregada y por persona del entorno) se ven al pulsar la tarjeta de renta.
+
 ## Seguridad / contraseña
 
 La app se sirve **cifrada**: `index.html` es una pantalla de acceso que descifra la app (AES-256, Web Crypto) solo con la contraseña correcta. Los datos nunca están en claro en el sitio público.

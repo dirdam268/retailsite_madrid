@@ -59,7 +59,7 @@ sat_s     × 0.28
 ratio_s   × 0.18   (hab/tienda)
 hab_s     × 0.18   (densidad poblacional)
 alq_s     × 0.16
-(100-renta_s) × 0.10   (renta inversa: rentas bajas ⇒ más necesidad de súper barato)
+(100-renta_s) × 0.10   (renta inversa: rentas bajas ⇒ más necesidad de súper barato; usa la renta real por persona del entorno 2 km, INE secciones 2023 — ver computeRentaEntorno / d.rentaEntorno)
 paro_s    × 0.10
 ```
 
