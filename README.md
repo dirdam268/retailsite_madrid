@@ -40,6 +40,10 @@ Fuente de aperturas: **revistainforetail.com** (alimentación, CAM). Incluidas: 
 
 Para nuevas aperturas: añadir la entrada a `MANUAL_STORES` (enseña, `ensena_key`, dom, cp, m², apertura, lat, lon) y reconstruir con `build-secure.ps1`. OpenStreetMap suele ir con retraso en aperturas muy recientes, así que lo manual es lo fiable.
 
+## Perfil socioeconómico por municipio
+
+En el detalle de cada municipio aparece un bloque "Perfil socioeconómico" con: **% con estudios superiores** y **% población de 65+ años** (Censo 2021, INE) y **paro registrado** (nº personas, SEPE junio 2026). Datos embebidos en `const SOCIO` (clave = nombre de municipio normalizado; `normZona()` / `getSocio()`). Solo municipios (no distritos de Madrid ciudad, que son nivel municipal en estas fuentes). Descartados por no aportar a nivel de zona: renta duplicada (ya integrada) y precio de vivienda (solo disponible a nivel provincial).
+
 ## Renta por sección en el score
 
 El componente de renta del score (renta inversa, 10%) usa la **renta real por persona del entorno de 2 km** de cada zona (`computeRentaEntorno`, media ponderada por población de las secciones INE ADRH 2023), en vez del agregado por hogar del municipio. Zonas rurales (secciones muy grandes sin centroide en 2 km) caen a la sección con renta más cercana. Ambas rentas (por hogar agregada y por persona del entorno) se ven al pulsar la tarjeta de renta.
