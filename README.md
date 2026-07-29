@@ -40,6 +40,14 @@ Fuente de aperturas: **revistainforetail.com** (alimentación, CAM). Incluidas: 
 
 Para nuevas aperturas: añadir la entrada a `MANUAL_STORES` (enseña, `ensena_key`, dom, cp, m², apertura, lat, lon) y reconstruir con `build-secure.ps1`. OpenStreetMap suele ir con retraso en aperturas muy recientes, así que lo manual es lo fiable.
 
+## Búsqueda global por calle (solo distritos)
+
+En la pestaña **Distritos** hay un buscador de calle que consulta **todas las tiendas de todos los distritos de Madrid a la vez** (no hace falta elegir distrito antes). Al pulsar un resultado, selecciona el distrito correspondiente y centra el mapa exactamente en esa tienda con un resaltado morado. Solo distritos — en Municipios queda oculto (el buscador por calle dentro de una zona ya seleccionada, "Tiendas por calle", sigue funcionando igual en ambas pestañas; de paso se arregló un bug donde ese buscador no filtraba porque le faltaba la función `onStreetSearch`).
+
+## Exportar a PDF
+
+Botón **"🖨️ Exportar PDF"** en el detalle de cada zona: usa la función de impresión nativa del navegador (`window.print()` + CSS `@media print`), sin librerías externas. Oculta menús/paneles y deja solo el informe (cabecera, métricas, mapa, huecos, tiendas). En el diálogo de impresión, elegir "Guardar como PDF". En móvil, el navegador ofrece la misma opción (Chrome Android: directo; iOS Safari: Compartir → Imprimir → icono de compartir en la vista previa → Guardar en Archivos).
+
 ## Perfil socioeconómico por municipio
 
 En el detalle de cada municipio aparece un bloque "Perfil socioeconómico" con: **% con estudios superiores** y **% población de 65+ años** (Censo 2021, INE) y **paro registrado** (nº personas, SEPE junio 2026). Datos embebidos en `const SOCIO` (clave = nombre de municipio normalizado; `normZona()` / `getSocio()`). Solo municipios (no distritos de Madrid ciudad, que son nivel municipal en estas fuentes). Descartados por no aportar a nivel de zona: renta duplicada (ya integrada) y precio de vivienda (solo disponible a nivel provincial).
