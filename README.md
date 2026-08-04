@@ -44,9 +44,13 @@ Para nuevas aperturas: añadir la entrada a `MANUAL_STORES` (enseña, `ensena_ke
 
 En la pestaña **Distritos** hay un buscador de calle que consulta **todas las tiendas de todos los distritos de Madrid a la vez** (no hace falta elegir distrito antes). Al pulsar un resultado, selecciona el distrito correspondiente y centra el mapa exactamente en esa tienda con un resaltado morado. Solo distritos — en Municipios queda oculto (el buscador por calle dentro de una zona ya seleccionada, "Tiendas por calle", sigue funcionando igual en ambas pestañas; de paso se arregló un bug donde ese buscador no filtraba porque le faltaba la función `onStreetSearch`).
 
-## Exportar a PDF
+Todos los buscadores de texto (calle global, calle por zona, y el buscador principal de distrito/municipio) ignoran tildes: `normText()` compara en minúsculas y sin diacríticos, así que "Alcala" encuentra "Alcalá". Y el resaltado del mapa al elegir un resultado de calle usa `fitBounds({animate:false})` cuando hay un punto pendiente que resaltar — si se anima, Leaflet puede ignorar el `setView` posterior por tener ya una animación en curso (pasaba sobre todo en móvil).
 
-Botón **"🖨️ Exportar PDF"** en el detalle de cada zona: usa la función de impresión nativa del navegador (`window.print()` + CSS `@media print`), sin librerías externas. Oculta menús/paneles y deja solo el informe (cabecera, métricas, mapa, huecos, tiendas). En el diálogo de impresión, elegir "Guardar como PDF". En móvil, el navegador ofrece la misma opción (Chrome Android: directo; iOS Safari: Compartir → Imprimir → icono de compartir en la vista previa → Guardar en Archivos).
+## Generar PDF
+
+Botón **"📄 Generar PDF"** en el detalle de cada zona: genera y descarga directamente un archivo `.pdf` (con `jsPDF`, vía CDN — sin diálogo de impresión de por medio). Incluye: métricas principales, renta real del entorno, perfil socioeconómico (municipios), desglose de competencia por enseña, huecos de mercado detectados, hueco especial, y el listado de tiendas de la zona (hasta 40, con aviso si hay más). Paginación automática.
+
+No incluye una captura del mapa: los tiles satélite/calles son de servidores externos (Esri/OpenStreetMap) que el navegador puede bloquear al capturarlos por CORS de forma no siempre predecible — mejor un PDF que funcione siempre con todos los datos en texto que uno que a veces salga con el mapa roto.
 
 ## Perfil socioeconómico por municipio
 
