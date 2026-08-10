@@ -16,13 +16,30 @@ Abrir `http://localhost:8000` en el navegador.
 
 No hace falta build ni instalación — vanilla JS + Leaflet + Chart.js desde CDN.
 
+## Huecos verdes (los 5 normales)
+
+El score de cada punto candidato combina 3 factores, todos con datos reales:
+1. **Densidad de competidores × distancia** (estilo Unistead, como siempre): premia zonas con mercado (≥3-5 competidores en 500m) pero con hueco propio (≥150m a la tienda más cercana).
+2. **Densidad comercial real en 500m** (m²/1.000 hab), con bandas reales de referencia (fuente: Abacus, geomarketing retail): `<200` muy baja saturación · `200-260` · `260-300` · `300-320` · `>320` muy saturado. Menos densidad puntúa más.
+3. **Población real cercana** (INE por sección censal, radio de 3 min: 900 m distrito / 1.500 m municipio), usando como referencia los 3.000 hab del criterio "zona 3 min sin competencia" (ver Hueco especial) al mismo radio para el que se definió.
+
+El popup de cada hueco muestra la densidad comercial y la población reales de esa zona.
+
 ## Hueco especial (negro)
 
-Además de los 5 huecos verdes, en cada distrito/municipio se busca **un "hueco especial"** (marcador negro) que cumpla criterios de población por tiempo de coche:
+Además de los 5 huecos verdes, en cada distrito/municipio se busca **un "hueco especial"** (marcador negro), siguiendo el documento **"EG — Métricas expansión formato de proximidad"** (Urbano/Rural). Dos bloques, cada uno exige **mínimo 2 de 3 criterios**:
 
-- Zona 3 min: sin competencia ≥3.000 hab · con competencia ≥4.000 hab
-- Zona 5 min: sin competencia ≥6.000 (distrito) / 5.000 (municipio) hab · con competencia ≥8.000 (distrito) / 6.000 (municipio) hab
-- Se prioriza el hueco **sin competencia** (la oportunidad real). Si no cumple ninguno, no se marca.
+**Población** (mínimo 2 de 3):
+- Zona 3 min: ≥3.000 hab si no hay competencia ahí, ≥4.000 si la hay
+- Zona 5 min: ≥6.000/5.000 hab (distrito/municipio) sin competencia, ≥8.000/6.000 con ella
+- Barrio (distrito) ≥20.000 hab total, o pueblo (municipio) >3.000 hab total
+
+**Competencia** (mínimo 2 de 3, techo en m² — no solo presencia/ausencia):
+- Zona 3 min: ≤600 m² de competencia
+- Zona 5 min: ≤2.000 m² de competencia
+- Zona 5 min: ≤1 supermercado
+
+Solo se marca si pasan **ambos bloques**. El popup muestra qué sub-criterios concretos se cumplen (✅/❌) para que sea auditable.
 
 Los tiempos 3/5 min se **aproximan por radio** (no isócronas reales): distrito 900 m / 1,6 km; municipio 1,5 km / 2,6 km. La población es **real**: INE Censo Anual 2023 por sección censal (4.417 secciones de la CAM, geometría INE 2019, unidas por CUSEC; cubre ~97% de la población). Datos embebidos y cifrados en `SECCIONES` dentro de `index-src.html`.
 
