@@ -75,9 +75,14 @@ Botón **"📄 Generar PDF"** en el detalle de cada zona: genera y descarga dire
 
 No incluye una captura del mapa: los tiles satélite/calles son de servidores externos (Esri/OpenStreetMap) que el navegador puede bloquear al capturarlos por CORS de forma no siempre predecible — mejor un PDF que funcione siempre con todos los datos en texto que uno que a veces salga con el mapa roto.
 
-## Mi ubicación (geolocalización real)
+## Geolocalización
 
-Botón **"📍 Mi ubicación"** en los controles del mapa: pide permiso al navegador (`navigator.geolocation`, requiere HTTPS y gesto explícito del usuario — nunca se pide sola) y, si lo da, coloca un marcador azul en tu posición real y centra el mapa ahí. A partir de ahí, **cada popup de hueco** (verde y especial) muestra la distancia real caminando en línea recta desde tu ubicación hasta ese punto. El marcador se recalcula en cada `renderMap()` (el mapa se recrea entero al cambiar de zona), así que persiste al navegar entre distritos/municipios sin tener que volver a pedir permiso.
+Dos botones distintos, para dos usos distintos:
+
+- **📍 junto a la búsqueda principal** (`geolocalizarYBuscar()`) — el más útil: localiza al usuario y **abre directamente** su distrito o municipio, con todos sus datos. Usa reverse geocoding de Nominatim (`address.city_district`/`suburb` → los 21 distritos; `address.town`/`village`/`municipality`/`city` → los 122 municipios) para identificar la zona real, cambia de pestaña si hace falta y selecciona la zona. Si no reconoce la zona (fuera de la CAM) o el navegador deniega el permiso, lo dice en un mensaje bajo el buscador (no un `alert()` bloqueante).
+- **📍 Mi ubicación en los controles del mapa** (`locateMe()`) — más simple: solo coloca un marcador azul en tu posición real dentro de la zona que ya tienes abierta, sin cambiar de zona. Útil si ya estás viendo tu distrito y quieres ver dónde caes tú exactamente respecto a los huecos.
+
+Ambos piden permiso al navegador (`navigator.geolocation`, requiere HTTPS y gesto explícito del usuario — nunca se piden solos) y comparten la misma variable `userLocation`. Una vez fijada, **cada popup de hueco** (verde y especial) muestra la distancia real en línea recta desde ahí. El marcador se recalcula en cada `renderMap()` (el mapa se recrea entero al cambiar de zona), así que persiste al navegar sin volver a pedir permiso.
 
 ## Perfil socioeconómico por municipio
 
