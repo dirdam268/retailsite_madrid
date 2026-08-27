@@ -1,6 +1,29 @@
-# RetailSite Madrid
+# RetailSite
 
-Herramienta web para análisis de expansión de supermercados en la Comunidad de Madrid. Cruza el censo real de distribución alimentaria con datos socioeconómicos y detecta huecos de mercado con validación urbana.
+Herramienta web para análisis de expansión de supermercados. Cruza el censo real de distribución alimentaria con datos socioeconómicos y detecta huecos de mercado con validación urbana.
+
+## Regiones cubiertas
+
+Selector de región en la cabecera:
+
+| Región | Zonas | Tiendas del censo | Alquiler |
+|---|---|---|---|
+| **Comunidad de Madrid** | 21 distritos + 122 municipios | 2.331 | ✅ precios reales 2024 |
+| **País Vasco** | 251 municipios (Álava, Bizkaia, Gipuzkoa) | 1.079 | ❌ sin datos todavía |
+
+**País Vasco — fuentes (todas reales, ninguna inventada):**
+- Tiendas: Censo de Distribución Alimentaria 2024 (filtrado a País Vasco: 1.081 filas, 1.079 asignadas a municipio; 2 descartadas porque el propio censo no trae municipio).
+- Geometría y centroides: secciones censales INE 2019 (1.711 secciones).
+- Población por sección censal a 01/01/2025: Diputaciones Forales de Álava, Bizkaia y Gipuzkoa.
+- Renta 2023 (por persona y por hogar): INE Atlas de Distribución de Renta de los Hogares — **una tabla por provincia**: Álava `30851`, Bizkaia `30917`, Gipuzkoa `31007`.
+- Paro registrado municipal (dic-2025): Lanbide / Open Data Euskadi.
+- % estudios superiores: Censo INE 2021-2024, tabla `66621` (solo municipios ≥500 hab → 189 de 251 tienen dato; el resto queda vacío, no se rellena).
+
+**Limitaciones honestas del País Vasco:**
+- **Sin datos de alquiler.** No se inventa ningún valor: el índice orientativo se calcula **sin ese componente** y su 16% se reparte proporcionalmente entre los otros 5 factores. Las tarjetas y el PDF muestran "Sin dato", y el filtro "Alquiler ≤8€" se oculta.
+- **Bilbao, Vitoria-Gasteiz y Donostia van sin desglose por distrito**, como municipios grandes. Existen límites oficiales de barrio ([Vitoria](https://opendata.euskadi.eus/catalogo/-/barrios-vitoria-gasteiz-limites-territoriales/), [Bilbao](https://github.com/BilbaoDataLab/zonificacion-escolar-bilbao/blob/master/data/distritos-bilbao.geojson), [Donostia](https://www.donostia.eus/datosabiertos/catalogo/wms-limites_administrativos)) pero en 3 formatos y proyecciones distintos; queda pendiente si algún día se quiere afinar.
+- La búsqueda global por calle sigue siendo **solo de Madrid** (está acotada a la CAM en Nominatim); en País Vasco no se muestra, en vez de dar resultados falsos.
+- El m² medio por enseña se calculó sobre las tiendas de Madrid; en País Vasco solo se usa como respaldo cuando el censo no trae el m² real de esa tienda concreta.
 
 ## Arranque rápido
 

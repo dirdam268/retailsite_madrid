@@ -4,9 +4,27 @@ Este fichero orienta a Claude Code sobre el proyecto y las preferencias del auto
 
 ## El proyecto
 
-App web de análisis de expansión de supermercados en Madrid. Vanilla JS + Leaflet + Chart.js. Sin build ni framework. Todo en un único `index.html` autocontenido más JSONs de datos en `data/`.
+App web de análisis de expansión de supermercados. Vanilla JS + Leaflet + Chart.js. Sin build ni framework. Todo en un único `index.html` autocontenido más JSONs de datos en `data/`.
 
-Version actual: v0.6
+Version actual: v0.7 (multi-región)
+
+### Multi-región
+
+`state.region` (`"madrid"` | `"pv"`) + `REGIONES_META`. Selector en la cabecera (`#regionSelect`, `setRegion()`).
+
+- **Los municipios llevan `region`**; los que no la llevan se tratan como `"madrid"` (`d.region||"madrid"`), así los datos antiguos siguen valiendo sin tocarlos.
+- Los datos de una región nueva se **añaden** a las estructuras existentes (`Object.assign(MUNI_CENTERS,…)`, `MUNICIPIOS.push(…)`, etc.), NO se reemplazan. Los distritos son solo de Madrid.
+- Al añadir una región: comprobar **colisiones de nombre de municipio** con las que ya existen (las claves de `STORES_MUNI`/`MUNI_CENTERS`/`SOCIO` son el nombre). Madrid y País Vasco no colisionan en ninguno; verificado.
+- Las claves de `SOCIO` usan `normZona()` — si se generan desde PowerShell, hay que portar esa función **exactamente** (mayúsculas, sin acentos, sin artículo inicial, texto antes de la primera coma).
+- `REGIONES_META[r].tienedistritos` controla si se muestra la pestaña Distritos y la búsqueda global por calle (que está acotada a la CAM en Nominatim).
+
+**Trampas de PowerShell al generar los datos** (todas encontradas y corregidas al montar País Vasco):
+- Parsear decimales con `[double]::TryParse($s,[ref]$n)` usa la **cultura española** y destroza los números: usar siempre `InvariantCulture`.
+- Los CSV del INE traen **varios indicadores por municipio** (neta/bruta, por persona/por hogar): hay que filtrar por la columna del indicador o la última fila pisa a la buena.
+- Las cifras en euros del INE usan `.` como separador de **miles**, no decimal: quitar los puntos antes de parsear.
+- PowerShell **desenvuelve los arrays de un elemento**: `$lista.Count` sobre una lista de 1 tienda devuelve el nº de claves del objeto. Usar `@(...)` siempre.
+- Un `if` que devuelve `@()` se colapsa a `$null`, y `@($null)` es un array de un elemento nulo. Construir el array explícitamente.
+- Comparar categorías con acentos entre el script y un CSV UTF-8 falla por codificación: comparar con patrones ASCII (`-like '*grado superior*'`).
 
 ## Regla número uno
 
@@ -63,7 +81,9 @@ alq_s     × 0.16
 paro_s    × 0.10
 ```
 
-Si cambian los pesos, actualizar también el bloque en el panel derecho de la app y el `README.md`.
+**Si falta el alquiler** (`hasAlq(d)` falso, p.ej. todo País Vasco): NO se usa un valor por defecto. Se excluye `alq_s` y su 0.16 se reparte proporcionalmente entre el resto (`/(1-0.16)`), `sc.alq_s` queda `null` y `sc.sinAlq` a `true`. La UI y el PDF muestran "Sin dato". Ojo: `getAlq()` sigue teniendo un `|| 10` interno — **comprobar `hasAlq()` antes de mostrar nada al usuario**.
+
+Si cambian los pesos, actualizar también el bloque en el panel derecho de la app (que ya distingue 6 factores / 5 factores según región) y el `README.md`.
 
 ### Colores del score
 

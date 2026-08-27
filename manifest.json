@@ -1,7 +1,7 @@
 {
-  "name": "RetailSite Madrid — Expansión de Supermercados",
-  "short_name": "RetailSite Madrid",
-  "description": "Análisis de expansión de supermercados en la Comunidad de Madrid: huecos de mercado, saturación y viabilidad",
+  "name": "RetailSite — Expansión de Supermercados",
+  "short_name": "RetailSite",
+  "description": "Análisis de expansión de supermercados en la Comunidad de Madrid y el País Vasco: huecos de mercado, saturación y viabilidad",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

@@ -40,12 +40,12 @@ $gate = @'
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RetailSite Madrid</title>
+<title>RetailSite</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#16a34a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="RetailSite Madrid">
+<meta name="apple-mobile-web-app-title" content="RetailSite">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
@@ -68,7 +68,7 @@ $gate = @'
 <body>
 <div class="gate">
   <div class="lock">🔒</div>
-  <div class="logo">🛒 Retail<span>Site</span> Madrid</div>
+  <div class="logo">🛒 Retail<span>Site</span></div>
   <div class="sub">Acceso privado</div>
   <input id="pw" type="password" placeholder="Contraseña" autocomplete="current-password" autofocus>
   <button id="go">Entrar</button>
