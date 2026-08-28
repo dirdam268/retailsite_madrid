@@ -12,7 +12,11 @@ Version actual: v0.7 (multi-región)
 
 `state.region` (`"madrid"` | `"pv"` | `"cb"` | `"ri"` | `"nc"`) + `REGIONES_META`. Selector en la cabecera (`#regionSelect`, `setRegion()`).
 
-**`REGIONES_META` es la ficha de cada región y la UI lee de ahí** (`regMeta()`): `label`, `tienedistritos`, `pobAnio`, `fuentePob`, `fuenteRenta`, `fuenteParo`, `listaFuentes` y `avisos`. Al añadir una región solo hay que rellenar su ficha — **no** encadenar más `state.region==="xx" ? … : …` por la UI (así estaba y se volvió ilegible con 3 regiones).
+**`REGIONES_META` es la ficha de cada región y la UI lee de ahí** (`regMeta()`): `label`, `tienedistritos`, `pobAnio`, `grupo`, `fuentePob`, `fuenteRenta`, `fuenteParo`, `listaFuentes` y `avisos`. Al añadir una región solo hay que rellenar su ficha — **no** encadenar más `state.region==="xx" ? … : …` por la UI (así estaba y se volvió ilegible con 3 regiones). Las 7 provincias sueltas se generan en un bucle al final del objeto, porque comparten estructura de fuentes.
+
+**El selector es un `<select>` agrupado por `grupo`** (`renderRegionSelect()`), no botones: con 12 zonas no caben, menos en móvil. Las provincias van bajo "«Comunidad» — solo estas provincias" para no dar a entender que está la comunidad entera. `setRegion()` sincroniza el `value` porque también se llama desde la geolocalización.
+
+**Municipios HOMÓNIMOS entre provincias: hay que desambiguarlos** con la provincia entre paréntesis, porque `MUNI_CENTERS` / `STORES_MUNI` / `SOCIO` se indexan por NOMBRE y uno machacaría al otro. Ya resueltos: Villanueva de los Infantes (CR/VA), Serrada (AV/VA), Sotillo (GU/SG). **Paréntesis, nunca coma**: `normZona()` corta en la primera coma, así que "Serrada, La (Ávila)" seguiría colapsando a "SERRADA". Hay que quitar el artículo final ANTES de añadir la provincia. Comprobar siempre las colisiones de nombre Y las de clave `normZona` (que son distintas: "Serrada" y "Serrada, La" son nombres distintos pero misma clave).
 
 **La geolocalización tiene tres trampas ya resueltas, no las reintroduzcas** (`geolocalizarYBuscar()`):
 1. Nominatim devuelve varios campos a la vez (`village:"Monte"` + `city:"Santander"`): se prueban todos y gana el primero que sea un municipio real.
@@ -107,6 +111,8 @@ paro_s    × 0.10
 **Datos marcados como estimación.** `item.paro_estimado === true` (Cantabria y La Rioja) significa que la tasa de paro NO es oficial: se deriva de `parados / población 18-64` porque no existe tasa municipal vigente. La tarjeta pone "(est.)", el detalle muestra un aviso ámbar y el PDF lo dice. No es comparable con la de Madrid. Si en el futuro aparece una tasa oficial, quitar el flag.
 
 **El SEPE censura los recuentos pequeños** escribiendo `"<5"` (privacidad). No es un número: esos municipios van con `paro:null` (74 de 174 en La Rioja) y la UI dice "Sin dato" explicando por qué.
+
+**En las provincias con código INE < 10 (Ávila = 05) Excel se come el cero inicial** del código municipal en el XLS del SEPE: llega `"5001"` en vez de `"05001"`. Hay que rellenar a 5 dígitos o esa provincia se queda entera sin paro (pasó, y se detectó porque salieron 248 municipios sin dato y 0 censurados — un patrón imposible).
 
 **Si falta el alquiler** (`hasAlq(d)` falso, p.ej. País Vasco, Cantabria y La Rioja): NO se usa un valor por defecto. Se excluye `alq_s` y su 0.16 se reparte proporcionalmente entre el resto (`/(1-0.16)`), `sc.alq_s` queda `null` y `sc.sinAlq` a `true`. La UI y el PDF muestran "Sin dato". Ojo: `getAlq()` sigue teniendo un `|| 10` interno — **comprobar `hasAlq()` antes de mostrar nada al usuario**.
 

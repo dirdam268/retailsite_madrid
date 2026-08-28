@@ -13,6 +13,21 @@ Selector de región en la cabecera:
 | **Cantabria** | 102 municipios | 407 | ❌ sin datos todavía |
 | **La Rioja** | 174 municipios | 171 | ❌ sin datos todavía |
 | **Navarra** | 272 municipios | 419 | ❌ sin datos todavía |
+| **Ávila** (provincia) | 248 municipios | 107 | ❌ |
+| **Salamanca** (provincia) | 362 municipios | 178 | ❌ |
+| **Segovia** (provincia) | 209 municipios | 98 | ❌ |
+| **Valladolid** (provincia) | 225 municipios | 281 | ❌ |
+| **Ciudad Real** (provincia) | 102 municipios | 281 | ❌ |
+| **Guadalajara** (provincia) | 288 municipios | 123 | ❌ |
+| **Toledo** (provincia) | 204 municipios | 428 | ❌ |
+
+**Total: 2.559 municipios (+ 21 distritos de Madrid) y 10.532 secciones censales.**
+
+Las siete últimas son **provincias sueltas, no comunidades enteras**. En el selector aparecen agrupadas bajo "Castilla y León — solo estas provincias" y "Castilla-La Mancha — solo estas provincias" para que quede claro. Se filtraron por los dos primeros dígitos del código INE dentro de la geometría de cada comunidad; el número de municipios coincide exactamente con el de la tabla de renta del INE en las siete.
+
+**Fuentes de las 7 provincias** (idénticas en todas): censo 2024; población, % 65+ y % <18 del INE (Atlas, **una tabla de demografía por provincia**, 2023); renta por persona y por hogar (Atlas ADRH, **una tabla por provincia**, 2023); paro registrado del SEPE (enero 2026); estudios del Censo INE 2021-2024. Tablas del INE (renta/demografía): Ávila `30869`/`30877`, Ciudad Real `30971`/`30979`, Guadalajara `31034`/`31042`, Salamanca `31178`/`31186`, Segovia `31196`/`31204`, Toledo `31241`/`31249`, Valladolid `31259`/`31267`.
+
+**Municipios homónimos.** La app indexa por nombre, así que tres pares que se repetían llevan la provincia entre paréntesis: **Villanueva de los Infantes** (Ciudad Real / Valladolid), **Serrada** (Ávila / Valladolid) y **Sotillo** (Guadalajara / Segovia).
 
 **Navarra — fuentes:**
 - Tiendas: Censo de Distribución Alimentaria 2024 (420 filas → 419 tiendas; 1 descartada porque el censo no trae coordenadas).
