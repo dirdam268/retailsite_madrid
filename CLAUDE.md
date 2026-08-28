@@ -114,6 +114,8 @@ paro_s    × 0.10
 
 **En las provincias con código INE < 10 (Ávila = 05) Excel se come el cero inicial** del código municipal en el XLS del SEPE: llega `"5001"` en vez de `"05001"`. Hay que rellenar a 5 dígitos o esa provincia se queda entera sin paro (pasó, y se detectó porque salieron 248 municipios sin dato y 0 censurados — un patrón imposible).
 
+**Ventas estimadas (Nielsen).** `VENTAS_EST` es un lookup `"lat,lon"` (5 decimales) → `[venta €/año, nº comparables]`, precalculado con `scratchpad/build_nielsen_est.ps1` a partir del panel Nielsen de "Mi Cifra de Ventas" (mismo algoritmo que su `getNielsenEstimate`). `mergeVentasEstimadas()` lo asigna a `s.ventasEst` **solo si la tienda no tiene `s.ventas`**. Reglas que NO se pueden romper: la estimación se pinta en ámbar con "est.", nunca en el verde de las reales; y **no entra** en `totalSales`, ni en el benchmark de ventas de la zona, ni en la canibalización — esos siguen filtrando por `s.ventas`. Si se añaden regiones, hay que regenerar `VENTAS_EST` (necesita `cat` y `m2` del censo; Madrid sale de `DATA.madrid` de la otra app).
+
 **Si falta el alquiler** (`hasAlq(d)` falso, p.ej. País Vasco, Cantabria y La Rioja): NO se usa un valor por defecto. Se excluye `alq_s` y su 0.16 se reparte proporcionalmente entre el resto (`/(1-0.16)`), `sc.alq_s` queda `null` y `sc.sinAlq` a `true`. La UI y el PDF muestran "Sin dato". Ojo: `getAlq()` sigue teniendo un `|| 10` interno — **comprobar `hasAlq()` antes de mostrar nada al usuario**.
 
 Si cambian los pesos, actualizar también el bloque en el panel derecho de la app (que ya distingue 6 factores / 5 factores según región) y el `README.md`.
