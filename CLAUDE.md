@@ -10,7 +10,15 @@ Version actual: v0.7 (multi-región)
 
 ### Multi-región
 
-`state.region` (`"madrid"` | `"pv"` | `"cb"` | `"ri"`) + `REGIONES_META`. Selector en la cabecera (`#regionSelect`, `setRegion()`). `POB_ANIO` guarda el año de la población de cada región (no todas tienen el mismo dato más reciente por sección: Madrid/PV 2025, Cantabria/La Rioja 2023) y se muestra en la tarjeta.
+`state.region` (`"madrid"` | `"pv"` | `"cb"` | `"ri"` | `"nc"`) + `REGIONES_META`. Selector en la cabecera (`#regionSelect`, `setRegion()`).
+
+**`REGIONES_META` es la ficha de cada región y la UI lee de ahí** (`regMeta()`): `label`, `tienedistritos`, `pobAnio`, `fuentePob`, `fuenteRenta`, `fuenteParo`, `listaFuentes` y `avisos`. Al añadir una región solo hay que rellenar su ficha — **no** encadenar más `state.region==="xx" ? … : …` por la UI (así estaba y se volvió ilegible con 3 regiones).
+
+**La geolocalización tiene tres trampas ya resueltas, no las reintroduzcas** (`geolocalizarYBuscar()`):
+1. Nominatim devuelve varios campos a la vez (`village:"Monte"` + `city:"Santander"`): se prueban todos y gana el primero que sea un municipio real.
+2. Los nombres bilingües oficiales llevan barra (`Pamplona/Iruña`) y Nominatim manda solo una mitad: 2ª pasada comparando contra cada mitad. 89 municipios la necesitan; comprobado que ninguna mitad choca con el nombre completo de otro municipio.
+3. **Un distrito solo vale si la ciudad es Madrid.** "Centro", "Salamanca" o "Retiro" son barrios comunes: Donostia devuelve `suburb:"Centro"` y seleccionaba el distrito Centro de MADRID.
+   Y como último recurso, si nada casa por nombre (exónimos tipo `Guecho`/`Getxo`), respaldo por cercanía al centro del municipio (máx 12 km) avisando de que es aproximado.
 
 **Fuentes ya localizadas para lo que queda.** El XLS nacional de municipios del SEPE (`ESTADISTICA_MUNICIPIOS.xls`, una hoja `PARO <PROVINCIA>` por provincia) cubre el paro de TODAS las provincias pendientes; ya está volcado en el scratchpad para Navarra, Toledo, Ciudad Real, Segovia, Valladolid, Ávila y Guadalajara. Las tablas del INE van **por provincia** y en pares consecutivos `renta` / `demografía` (+8): Álava 30851, Bizkaia 30917, Gipuzkoa 31007, Cantabria 30953/30961, La Rioja 31169/31177, Toledo 31241/31249. Para encontrar el par de una provincia nueva: listar `TABLAS_OPERACION/353` y consultar `DATOS_TABLA/<id>?nult=1`, que devuelve el nombre de un municipio de esa provincia.
 

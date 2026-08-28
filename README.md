@@ -12,6 +12,17 @@ Selector de región en la cabecera:
 | **País Vasco** | 251 municipios (Álava, Bizkaia, Gipuzkoa) | 1.079 | ❌ sin datos todavía |
 | **Cantabria** | 102 municipios | 407 | ❌ sin datos todavía |
 | **La Rioja** | 174 municipios | 171 | ❌ sin datos todavía |
+| **Navarra** | 272 municipios | 419 | ❌ sin datos todavía |
+
+**Navarra — fuentes:**
+- Tiendas: Censo de Distribución Alimentaria 2024 (420 filas → 419 tiendas; 1 descartada porque el censo no trae coordenadas).
+- Geometría: secciones censales INE 2019 (562 secciones).
+- Población, % de 65+ y % menor de 18: INE, Atlas, tabla `31132`, **año 2023**.
+- Renta 2023 (por persona y por hogar): INE Atlas ADRH, tabla `31124`.
+- Paro registrado por municipio: SEPE, XLS nacional de municipios, **enero 2026**.
+- % estudios superiores: Censo INE 2021-2024, tabla `66621` (120 de 272 municipios).
+
+**Limitaciones honestas de Navarra:** tasa de paro estimada (igual que Cantabria y La Rioja), **64 municipios sin paro publicado** (el SEPE censura los recuentos pequeños), población de 2023 y sin datos de alquiler.
 
 **La Rioja — fuentes:**
 - Tiendas: Censo de Distribución Alimentaria 2024 (171, todas asignadas).
