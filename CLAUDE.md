@@ -114,7 +114,16 @@ paro_s    × 0.10
 
 **En las provincias con código INE < 10 (Ávila = 05) Excel se come el cero inicial** del código municipal en el XLS del SEPE: llega `"5001"` en vez de `"05001"`. Hay que rellenar a 5 dígitos o esa provincia se queda entera sin paro (pasó, y se detectó porque salieron 248 municipios sin dato y 0 censurados — un patrón imposible).
 
-**Ventas estimadas (Nielsen).** `VENTAS_EST` es un lookup `"lat,lon"` (5 decimales) → `[venta €/año, nº comparables]`, precalculado con `scratchpad/build_nielsen_est.ps1` a partir del panel Nielsen de "Mi Cifra de Ventas" (mismo algoritmo que su `getNielsenEstimate`). `mergeVentasEstimadas()` lo asigna a `s.ventasEst` **solo si la tienda no tiene `s.ventas`**. Reglas que NO se pueden romper: la estimación se pinta en ámbar con "est.", nunca en el verde de las reales; y **no entra** en `totalSales`, ni en el benchmark de ventas de la zona, ni en la canibalización — esos siguen filtrando por `s.ventas`. Si se añaden regiones, hay que regenerar `VENTAS_EST` (necesita `cat` y `m2` del censo; Madrid sale de `DATA.madrid` de la otra app).
+**Ventas: JERARQUÍA de tres niveles, en `mergeVentasEstimadas()`.** Nunca se pisa un escalón superior:
+1. `s.ventas` — venta REAL del censo (verde).
+2. `s.ventasNiel` — cifra del panel Nielsen **para esa tienda** (azul). Lookup `VENTAS_NIELSEN` `"lat,lon"` → €/año, de `scratchpad/build_nielsen_match.ps1`: cruce por **CP + calle normalizada sin el tipo de vía**; si varias comparten clave, desempate por cadena y luego por m² más parecido.
+3. `s.ventasEst` — estimación por comparables (ámbar). Lookup `VENTAS_EST` `"lat,lon"` → `[€/año, nº comparables]`, de `build_nielsen_est.ps1`.
+
+Reglas que NO se pueden romper: ni el azul ni el ámbar entran en `totalSales`, ni en el benchmark de zona, ni en la canibalización — esos filtran por `s.ventas`. Al añadir regiones hay que regenerar ambos lookups (necesitan CP, dirección, categoría y m² del censo; Madrid sale de `DATA.madrid` de la otra app).
+
+**El cruce por m² NO funciona** (4 coincidencias de 3.575): Nielsen mide sala de ventas y el censo superficie total. Hay que cruzar por CP+calle.
+
+**El fichero "Datos Nielsen.xlsx" tiene mucho más que lo que extrae la otra app** (que solo lee superficie, tipo y €/m²): 28 columnas con código, cadena, rótulo, dirección, CP, provincia, municipio, **código INE**, m², tipo, apertura y ventas por familia de producto. Columnas útiles: A=código, D=rótulo, F=dirección, J=CP, N=municipio, Q=COD_INE, R=superficie, S=tipo, Z=Vta Alim. (anual), AA=€/m².
 
 **Si falta el alquiler** (`hasAlq(d)` falso, p.ej. País Vasco, Cantabria y La Rioja): NO se usa un valor por defecto. Se excluye `alq_s` y su 0.16 se reparte proporcionalmente entre el resto (`/(1-0.16)`), `sc.alq_s` queda `null` y `sc.sinAlq` a `true`. La UI y el PDF muestran "Sin dato". Ojo: `getAlq()` sigue teniendo un `|| 10` interno — **comprobar `hasAlq()` antes de mostrar nada al usuario**.
 

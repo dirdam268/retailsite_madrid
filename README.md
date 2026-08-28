@@ -27,25 +27,33 @@ Las siete últimas son **provincias sueltas, no comunidades enteras**. En el sel
 
 **Fuentes de las 7 provincias** (idénticas en todas): censo 2024; población, % 65+ y % <18 del INE (Atlas, **una tabla de demografía por provincia**, 2023); renta por persona y por hogar (Atlas ADRH, **una tabla por provincia**, 2023); paro registrado del SEPE (enero 2026); estudios del Censo INE 2021-2024. Tablas del INE (renta/demografía): Ávila `30869`/`30877`, Ciudad Real `30971`/`30979`, Guadalajara `31034`/`31042`, Salamanca `31178`/`31186`, Segovia `31196`/`31204`, Toledo `31241`/`31249`, Valladolid `31259`/`31267`.
 
-## Ventas de las tiendas: reales y estimadas
+## Ventas de las tiendas: tres niveles
 
-El censo trae ventas **solo para 862 de las 5.908 tiendas** (15%), y son de vintages muy distintos (DIA 2011-2012, Carrefour 2018/2019, Supercor feb-2021, Eroski mensual). Para el resto se muestra ahora una **estimación** procedente del panel Nielsen que usa la app "Mi Cifra de Ventas": la media aritmética del €/m² de las tiendas Nielsen de la **misma categoría, mismo carácter (capital de provincia o no) y m² dentro de ±15%**, multiplicada por los m² de la tienda. Mismo algoritmo que `getNielsenEstimate()` allí; aquí va **precalculado** (`VENTAS_EST`, 177 KB) para no cargar el pool de 20.606 filas.
+El censo trae ventas **solo para 862 de las 5.908 tiendas** (15%), y de vintages muy distintos (DIA 2011-2012, Carrefour 2018/2019, Supercor feb-2021, Eroski mensual). El resto se rellena con el fichero **"Datos Nielsen"** (24.971 tiendas con rótulo, dirección, CP, código INE, m² y venta anual de alimentación), en dos escalones:
 
-Cobertura tras el cambio: **89%** (862 reales + 4.385 estimadas). Las 661 restantes son cash & carry (categoría que Nielsen no cubre) o tamaños sin comparables.
+| | Qué es | Tiendas |
+|---|---|---|
+| 🟢 **Verde** | Venta **real** del censo, con su año | 862 |
+| 🔵 **Azul 📊** | Cifra del **panel Nielsen para esa tienda**, cruzada por CP + calle normalizada | 1.798 |
+| 🟠 **Ámbar "est."** | **Estimación**: media del €/m² de tiendas Nielsen de igual categoría, mismo carácter (capital o no) y m² ±15% | 2.634 |
 
-**La estimación nunca pisa un dato real.** Solo se asigna a tiendas sin venta en el censo (verificado: 0 tiendas con ambas), se pinta en **ámbar con "est."** frente al verde de las reales, y **no entra** en el recuento de tiendas con ventas, ni en el benchmark de la zona, ni en la canibalización.
+Cobertura total: **90%**. Las 614 restantes son cash & carry (categoría que Nielsen no cubre) o tamaños sin comparables.
 
-**Fiabilidad, medida contra las 457 tiendas de Madrid que sí tienen venta real:**
+**Nunca se pisa un escalón superior**, verificado: 0 tiendas tienen más de uno. Ni el azul ni el ámbar entran en el recuento de tiendas con ventas, ni en el benchmark de la zona, ni en la canibalización — esos siguen filtrando por venta real.
 
-| Tamaño | n | Mediana estim./real | Dentro de un factor 2 |
+**Cruce directo (azul)**: por CP + calle sin el tipo de vía; si varias tiendas Nielsen comparten esa clave se desempata por cadena y luego por m² más parecido. Contrastado contra las ventas reales del censo:
+
+| Cadena | n | Mediana Nielsen/real | Dentro de un factor 2 |
 |---|---|---|---|
-| <400 m² | 218 | 0,74× | 72% |
-| 400-999 m² | 142 | 0,87× | **82%** |
-| 1.000-2.499 m² | 92 | 1,24× | 53% |
-| ≥2.500 m² | 5 | 22,75× | 0% |
-| **Total** | **457** | **0,85×** | **71%** |
+| DIA | 147 | 1,10× | 79% |
+| Carrefour | 22 | 1,16× | 73% |
+| Mercadona | 20 | 1,22× | 80% |
 
-El tramo de hipermercados no es concluyente: las 5 cifras "reales" del censo con las que se compara son implausibles (1,9 M€/año para 12.000 m²), así que ahí el dato sospechoso es la referencia, no la estimación.
+El sesgo al alza de ~×1,1-1,2 es coherente con que Nielsen sea actual y las del censo de 2011-2019, no con un error de cruce.
+
+**Estimación por comparables (ámbar)**, contrastada contra 457 tiendas de Madrid con venta real: mediana **0,85×**, 71% dentro de un factor 2 (82% entre 400 y 999 m², 72% por debajo de 400, 53% entre 1.000 y 2.499). En hipermercados no hay contraste fiable: las 5 cifras "reales" disponibles son implausibles (1,9 M€/año para 12.000 m²), así que ahí el dato sospechoso es la referencia.
+
+Ambos van precalculados (`VENTAS_NIELSEN` 62 KB, `VENTAS_EST` 177 KB) con `scratchpad/build_nielsen_match.ps1` y `build_nielsen_est.ps1`, en vez de embeber las 24.971 filas del fichero.
 
 **Municipios homónimos.** La app indexa por nombre, así que tres pares que se repetían llevan la provincia entre paréntesis: **Villanueva de los Infantes** (Ciudad Real / Valladolid), **Serrada** (Ávila / Valladolid) y **Sotillo** (Guadalajara / Segovia).
 
