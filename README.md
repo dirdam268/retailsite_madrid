@@ -11,6 +11,20 @@ Selector de región en la cabecera:
 | **Comunidad de Madrid** | 21 distritos + 122 municipios | 2.331 | ✅ precios reales 2024 |
 | **País Vasco** | 251 municipios (Álava, Bizkaia, Gipuzkoa) | 1.079 | ❌ sin datos todavía |
 | **Cantabria** | 102 municipios | 407 | ❌ sin datos todavía |
+| **La Rioja** | 174 municipios | 171 | ❌ sin datos todavía |
+
+**La Rioja — fuentes:**
+- Tiendas: Censo de Distribución Alimentaria 2024 (171, todas asignadas).
+- Geometría: secciones censales INE 2019 (343 secciones).
+- Población, % de 65+ y % menor de 18: INE, Atlas, tabla `31177`, **año 2023**.
+- Renta 2023 (por persona y por hogar): INE Atlas ADRH, tabla `31169`.
+- Paro registrado por municipio: SEPE, XLS nacional de municipios, **enero 2026**.
+- % estudios superiores: Censo INE 2021-2024, tabla `66621` (41 de 174 municipios: la tabla solo cubre municipios de ≥500 hab y La Rioja tiene muchos pueblos pequeños).
+
+**Limitaciones honestas de La Rioja:**
+- **La tasa de paro es una estimación propia**, igual que en Cantabria (`parados / población 18-64`). Marcada con "(est.)" y con aviso en el detalle. No comparable con Madrid.
+- **74 de los 174 municipios no tienen tasa de paro en absoluto**: el SEPE sustituye los recuentos pequeños por "&lt;5" para no permitir identificar personas. No se inventa un número — esos municipios muestran "Sin dato" y el índice se calcula sin ese factor.
+- Población de 2023 y sin datos de alquiler, como Cantabria.
 
 **Cantabria — fuentes:**
 - Tiendas: Censo de Distribución Alimentaria 2024 (407, todas asignadas a municipio).

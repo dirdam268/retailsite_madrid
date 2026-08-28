@@ -10,7 +10,9 @@ Version actual: v0.7 (multi-región)
 
 ### Multi-región
 
-`state.region` (`"madrid"` | `"pv"` | `"cb"`) + `REGIONES_META`. Selector en la cabecera (`#regionSelect`, `setRegion()`).
+`state.region` (`"madrid"` | `"pv"` | `"cb"` | `"ri"`) + `REGIONES_META`. Selector en la cabecera (`#regionSelect`, `setRegion()`). `POB_ANIO` guarda el año de la población de cada región (no todas tienen el mismo dato más reciente por sección: Madrid/PV 2025, Cantabria/La Rioja 2023) y se muestra en la tarjeta.
+
+**Fuentes ya localizadas para lo que queda.** El XLS nacional de municipios del SEPE (`ESTADISTICA_MUNICIPIOS.xls`, una hoja `PARO <PROVINCIA>` por provincia) cubre el paro de TODAS las provincias pendientes; ya está volcado en el scratchpad para Navarra, Toledo, Ciudad Real, Segovia, Valladolid, Ávila y Guadalajara. Las tablas del INE van **por provincia** y en pares consecutivos `renta` / `demografía` (+8): Álava 30851, Bizkaia 30917, Gipuzkoa 31007, Cantabria 30953/30961, La Rioja 31169/31177, Toledo 31241/31249. Para encontrar el par de una provincia nueva: listar `TABLAS_OPERACION/353` y consultar `DATOS_TABLA/<id>?nult=1`, que devuelve el nombre de un municipio de esa provincia.
 
 **Al añadir una región nueva, comprobar SIEMPRE (cada uno pilló un fallo real):**
 1. Colisiones de nombre de municipio contra TODAS las regiones ya cargadas (las claves de `STORES_MUNI`/`MUNI_CENTERS`/`SOCIO` son el nombre).
@@ -90,9 +92,15 @@ alq_s     × 0.16
 paro_s    × 0.10
 ```
 
-**Datos marcados como estimación.** `item.paro_estimado === true` (toda Cantabria) significa que la tasa de paro NO es oficial: se deriva de `parados / población 18-64` porque no existe tasa municipal vigente. La tarjeta pone "(est.)", el detalle muestra un aviso ámbar y el PDF lo dice. No es comparable con la de Madrid. Si en el futuro aparece una tasa oficial, quitar el flag.
+**REGLA GENERAL: un factor sin dato se excluye y su peso se reparte.** `calcScore` construye la lista `comps` de pares `[valor, peso]`, descarta los de valor `null`/`NaN` y divide por la suma de los pesos presentes. Con los 6 factores el resultado es idéntico al de siempre (verificado: los 21 distritos de Madrid no cambian ni un punto). Nunca rellenar un hueco con 0 o con un valor por defecto: un `renta:0` daría el MÁXIMO de "renta inversa" y un `paro:-1` contaminaría el score.
 
-**Si falta el alquiler** (`hasAlq(d)` falso, p.ej. País Vasco y Cantabria): NO se usa un valor por defecto. Se excluye `alq_s` y su 0.16 se reparte proporcionalmente entre el resto (`/(1-0.16)`), `sc.alq_s` queda `null` y `sc.sinAlq` a `true`. La UI y el PDF muestran "Sin dato". Ojo: `getAlq()` sigue teniendo un `|| 10` interno — **comprobar `hasAlq()` antes de mostrar nada al usuario**.
+**Los valores centinela (-1, 0) NO deben salir de los scripts de PowerShell al JSON.** Se emiten como `$null`. Este bug llegó a publicarse con Cantabria (Tresviso salió con `paro:-1` y `renta:0`).
+
+**Datos marcados como estimación.** `item.paro_estimado === true` (Cantabria y La Rioja) significa que la tasa de paro NO es oficial: se deriva de `parados / población 18-64` porque no existe tasa municipal vigente. La tarjeta pone "(est.)", el detalle muestra un aviso ámbar y el PDF lo dice. No es comparable con la de Madrid. Si en el futuro aparece una tasa oficial, quitar el flag.
+
+**El SEPE censura los recuentos pequeños** escribiendo `"<5"` (privacidad). No es un número: esos municipios van con `paro:null` (74 de 174 en La Rioja) y la UI dice "Sin dato" explicando por qué.
+
+**Si falta el alquiler** (`hasAlq(d)` falso, p.ej. País Vasco, Cantabria y La Rioja): NO se usa un valor por defecto. Se excluye `alq_s` y su 0.16 se reparte proporcionalmente entre el resto (`/(1-0.16)`), `sc.alq_s` queda `null` y `sc.sinAlq` a `true`. La UI y el PDF muestran "Sin dato". Ojo: `getAlq()` sigue teniendo un `|| 10` interno — **comprobar `hasAlq()` antes de mostrar nada al usuario**.
 
 Si cambian los pesos, actualizar también el bloque en el panel derecho de la app (que ya distingue 6 factores / 5 factores según región) y el `README.md`.
 
