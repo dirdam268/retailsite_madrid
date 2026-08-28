@@ -10,7 +10,16 @@ Version actual: v0.7 (multi-región)
 
 ### Multi-región
 
-`state.region` (`"madrid"` | `"pv"`) + `REGIONES_META`. Selector en la cabecera (`#regionSelect`, `setRegion()`).
+`state.region` (`"madrid"` | `"pv"` | `"cb"`) + `REGIONES_META`. Selector en la cabecera (`#regionSelect`, `setRegion()`).
+
+**Al añadir una región nueva, comprobar SIEMPRE (cada uno pilló un fallo real):**
+1. Colisiones de nombre de municipio contra TODAS las regiones ya cargadas (las claves de `STORES_MUNI`/`MUNI_CENTERS`/`SOCIO` son el nombre).
+2. Que `sum(n_establecimientos)` coincide con las filas del censo de esa región.
+3. Un municipio grande a mano (Bilbao, Santander): habitantes, renta, nº de tiendas. Un desfase de columnas en el TSV se ve al instante aquí — pasó con Cantabria, que no tiene columna `provincia` y desplazaba todo un índice.
+4. Que los scores de Madrid siguen idénticos (no debe cambiar ninguno).
+5. Geolocalización con coordenadas reales de la región nueva.
+
+**Nombres de municipio: el censo y la geometría INE no coinciden siempre.** `NormName` ya quita el artículo final en sus dos formas (`Astillero (El)` del censo vs `Astillero, El` de la geometría). Lo que NO resuelve son los exónimos (`Guecho`/`Getxo`), que afectan a la geolocalización — ver el respaldo por cercanía en `geolocalizarYBuscar()`.
 
 - **Los municipios llevan `region`**; los que no la llevan se tratan como `"madrid"` (`d.region||"madrid"`), así los datos antiguos siguen valiendo sin tocarlos.
 - Los datos de una región nueva se **añaden** a las estructuras existentes (`Object.assign(MUNI_CENTERS,…)`, `MUNICIPIOS.push(…)`, etc.), NO se reemplazan. Los distritos son solo de Madrid.
@@ -81,7 +90,9 @@ alq_s     × 0.16
 paro_s    × 0.10
 ```
 
-**Si falta el alquiler** (`hasAlq(d)` falso, p.ej. todo País Vasco): NO se usa un valor por defecto. Se excluye `alq_s` y su 0.16 se reparte proporcionalmente entre el resto (`/(1-0.16)`), `sc.alq_s` queda `null` y `sc.sinAlq` a `true`. La UI y el PDF muestran "Sin dato". Ojo: `getAlq()` sigue teniendo un `|| 10` interno — **comprobar `hasAlq()` antes de mostrar nada al usuario**.
+**Datos marcados como estimación.** `item.paro_estimado === true` (toda Cantabria) significa que la tasa de paro NO es oficial: se deriva de `parados / población 18-64` porque no existe tasa municipal vigente. La tarjeta pone "(est.)", el detalle muestra un aviso ámbar y el PDF lo dice. No es comparable con la de Madrid. Si en el futuro aparece una tasa oficial, quitar el flag.
+
+**Si falta el alquiler** (`hasAlq(d)` falso, p.ej. País Vasco y Cantabria): NO se usa un valor por defecto. Se excluye `alq_s` y su 0.16 se reparte proporcionalmente entre el resto (`/(1-0.16)`), `sc.alq_s` queda `null` y `sc.sinAlq` a `true`. La UI y el PDF muestran "Sin dato". Ojo: `getAlq()` sigue teniendo un `|| 10` interno — **comprobar `hasAlq()` antes de mostrar nada al usuario**.
 
 Si cambian los pesos, actualizar también el bloque en el panel derecho de la app (que ya distingue 6 factores / 5 factores según región) y el `README.md`.
 

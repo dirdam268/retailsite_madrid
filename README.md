@@ -10,6 +10,21 @@ Selector de región en la cabecera:
 |---|---|---|---|
 | **Comunidad de Madrid** | 21 distritos + 122 municipios | 2.331 | ✅ precios reales 2024 |
 | **País Vasco** | 251 municipios (Álava, Bizkaia, Gipuzkoa) | 1.079 | ❌ sin datos todavía |
+| **Cantabria** | 102 municipios | 407 | ❌ sin datos todavía |
+
+**Cantabria — fuentes:**
+- Tiendas: Censo de Distribución Alimentaria 2024 (407, todas asignadas a municipio).
+- Geometría y centroides: secciones censales INE 2019 (467 secciones).
+- Población, % de 65+ y % menor de 18: INE, Atlas, tabla `30961`, **año 2023**.
+- Renta 2023 (por persona y por hogar): INE Atlas ADRH, tabla `30953`.
+- Paro registrado por municipio: ICANE/SEPE, julio 2026.
+- % estudios superiores: Censo INE 2021-2024, tabla `66621` (84 de 102 municipios).
+
+**Limitaciones honestas de Cantabria:**
+- **La tasa de paro es una estimación propia, no un dato oficial.** No existe tasa de paro municipal vigente para Cantabria: ICANE dejó de calcularla en 2012, y SEPE e INE solo publican el *número* de parados. Se deriva como `parados registrados / población 18-64` y se marca en la app con "(est.)" más un aviso en el detalle. **No es comparable con la de Madrid**, que usa otra definición — sirve para comparar municipios *dentro* de Cantabria.
+- **La población es de 2023**, no de 2025 como Madrid y País Vasco: es el dato más reciente disponible por sección censal para esta región.
+- Sin datos de alquiler, igual que en País Vasco (el índice se calcula sin ese factor).
+- Tresviso (5 hab) y Pesquera (70 hab) no tienen renta: el INE la suprime en municipios tan pequeños.
 
 **País Vasco — fuentes (todas reales, ninguna inventada):**
 - Tiendas: Censo de Distribución Alimentaria 2024 (filtrado a País Vasco: 1.081 filas, 1.079 asignadas a municipio; 2 descartadas porque el propio censo no trae municipio).
