@@ -123,7 +123,14 @@ paro_s    × 0.05   (INVERTIDO: menos paro = mejor, es poder adquisitivo)
 
 **POBLACIÓN ALREDEDOR DE UN PUNTO: reparto por área, nunca la sección entera.** Solo tenemos el centroide de cada sección censal. Sumar la sección completa porque su centroide cae dentro del radio funciona en ciudad (sección de 120-170 m) pero MIENTE en el campo (secciones de km). `radioSecciones()` calcula una vez el tamaño real de cada sección = mitad de la distancia a la sección vecina más próxima (índice por celdas de 0,02°, ~430 ms) y lo guarda **en `se[4]`** — no en un array aparte, porque los bucles usan copias filtradas y se perdería el índice. `fraccionDentro(d, rs, r)` da el solape de dos círculos. Lo usan `evalHuecoEspecial` y `detectGaps`; **llamar a `radioSecciones()` antes de leer `se[4]`**.
 
-**El hueco tiene que estar DONDE VIVE LA GENTE, no solo cerca.** Un punto en el monte de El Escorial cumplía "3.400 hab a 3 min" con CERO vecinos a 300 m. Se exige `densidad(500 m) >= 0,25 × densidad media del área de 3 min`. Es relativa, así que vale igual para una ciudad densa que para un pueblo; el ¼ es umbral propio y ajustable. Quitó 11 huecos fantasma (45 → 34).
+**El hueco tiene que estar DONDE VIVE LA GENTE, no solo cerca.** Un punto en el monte de El Escorial cumplía "3.400 hab a 3 min" con CERO vecinos a 300 m. Se exige `p500 >= 3000 × (500/r3)²` — el propio criterio de población repartido por igual: **333 en municipio, 926 en distrito**. No es un número inventado.
+
+**Hay TRES sitios que generan huecos y los tres necesitan la comprobación** (se me escapó uno en el primer intento y la auditoría lo destapó):
+1. `evalHuecoEspecial` — hueco especial.
+2. `detectGaps`, bucle de candidatos — huecos verdes normales.
+3. `detectGaps`, **rama de `stores.length < 6`** — coloca 2 puntos por GEOMETRÍA pura alrededor del centroide, sin mirar población. Salían huecos a 2 km del pueblo con cero residentes (Villalbilla, Colmenar de Oreja) aunque fueran `lowConfidence`.
+
+Cuidado también con la guarda: la primera versión eximía el caso `densZona === 0`, y por ahí colaba un hueco en Oñati con **cero habitantes** en todo el radio. Auditoría final: 0 de 1.074 huecos verdes y 0 de 25 especiales en descampado.
 
 **Geolocalización: Nominatim a `zoom: 16`, NO 14.** A 14 devuelve a veces un pueblo VECINO: en el centro de Sevilla la Nueva contestaba "Navalagamella", a 13 km, y como Navalagamella existe en nuestros datos el match exacto la daba por buena (el respaldo por cercanía ni se activaba). Comprobado que a 16 acierta el municipio Y sigue dando el distrito en Madrid capital, que era lo único para lo que hacía falta el 14. Zoom 12 y 13 también fallan.
 

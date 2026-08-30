@@ -53,9 +53,11 @@ Caso real: un hueco en mitad del monte de El Escorial se apuntaba **4.426 vecino
 
 Ahora cada sección se modela como un **disco de radio = la mitad de la distancia a la sección vecina más próxima** (su tamaño real, deducido de los propios datos), con la gente repartida por igual, y solo se cuenta la parte del disco que cae dentro del círculo consultado. En ciudad no cambia nada; en el campo reparte la población como corresponde. Se aplica a los huecos verdes y al hueco especial.
 
-**Además, el punto tiene que estar donde vive la gente**, no solo cerca: se exige que la densidad pegada al punto (500 m) sea al menos **un cuarto** de la densidad media de su área de 3 minutos. Es una comprobación relativa, así que se adapta sola a una ciudad densa o a un pueblo. El ¼ es un umbral propio y ajustable.
+**Además, el punto tiene que estar donde vive la gente**, no solo cerca. El listón no es inventado: es el propio criterio de población (3.000 hab en la zona de 3 min) aplicado a 500 m suponiendo la gente repartida por igual — `3.000 × (500/r3)²`, que da **333 vecinos en municipio** (r3 = 1.500 m) y **926 en distrito** (r3 = 900 m). Si a 500 m no vive ni esa gente, el punto está fuera del casco urbano y se descarta.
 
-Efecto: los huecos especiales pasan de 45 a **34** — desaparecen 11 que estaban en descampado. Los que quedan tienen gente en la puerta: Las Rozas 1.956 vecinos a 500 m, Tolosa 2.229, Ondarroa 1.235.
+La regla se aplica **en los tres sitios** donde se generan huecos: el hueco especial, los huecos verdes normales, y los puntos geométricos que se colocan en municipios con menos de 6 tiendas (que antes no miraban la población en absoluto y podían caer a 2 km del pueblo, con cero residentes — Villalbilla, Colmenar de Oreja).
+
+Efecto: los huecos especiales pasan de 45 a **25**. Auditoría completa tras el cambio: **0 de 1.074 huecos verdes y 0 de 25 especiales caen en descampado**. Los que quedan tienen gente en la puerta: Las Rozas 1.956 vecinos a 500 m, Tolosa 2.229, Ondarroa 1.235.
 
 ## Ranking de huecos especiales
 
