@@ -114,6 +114,10 @@ paro_s    × 0.10
 
 **En las provincias con código INE < 10 (Ávila = 05) Excel se come el cero inicial** del código municipal en el XLS del SEPE: llega `"5001"` en vez de `"05001"`. Hay que rellenar a 5 dígitos o esa provincia se queda entera sin paro (pasó, y se detectó porque salieron 248 municipios sin dato y 0 censurados — un patrón imposible).
 
+**Ranking de huecos especiales.** `escanearHuecosEspeciales()` recorre distritos + municipios y cachea en `_rankingHuecos` (~5 s, datos estáticos). `abrirRankingHuecos()` pinta "Analizando…", cede el hilo con un `setTimeout` y luego renderiza; sin esa cesión el modal sale en blanco. `detectSpecialGap` acepta un 3er parámetro `habOverride` **obligatorio para el barrido**: sin él usaría `state.selected.hab`, que no es el municipio que se está evaluando. Para los municipios sin tienda hay que **recortar `SECCIONES` y `getAllStores()` con una caja de r5** antes de llamar a `evalHuecoEspecial`, o el barrido se dispara.
+
+**El índice y el hueco especial responden a preguntas distintas y hay que decirlo.** 39 de las 45 zonas con hueco puntúan BAJO: el índice valora el municipio entero como mercado (renta alta y alquiler caro lo hunden), el hueco valora un punto concreto. Cuando `sc.total < 45 && currentSpecialGap`, el detalle añade el aviso "⭐ Matiz importante". No quitar ese aviso: sin él el informe se lee como una contradicción.
+
 **Ventas: JERARQUÍA de tres niveles, en `mergeVentasEstimadas()`.** Nunca se pisa un escalón superior:
 1. `s.ventas` — venta REAL del censo (verde).
 2. `s.ventasNiel` — cifra del panel Nielsen **para esa tienda** (azul). Lookup `VENTAS_NIELSEN` `"lat,lon"` → €/año, de `scratchpad/build_nielsen_match.ps1`: cruce por **CP + calle normalizada sin el tipo de vía**; si varias comparten clave, desempate por cadena y luego por m² más parecido.

@@ -27,6 +27,24 @@ Las siete últimas son **provincias sueltas, no comunidades enteras**. En el sel
 
 **Fuentes de las 7 provincias** (idénticas en todas): censo 2024; población, % 65+ y % <18 del INE (Atlas, **una tabla de demografía por provincia**, 2023); renta por persona y por hogar (Atlas ADRH, **una tabla por provincia**, 2023); paro registrado del SEPE (enero 2026); estudios del Censo INE 2021-2024. Tablas del INE (renta/demografía): Ávila `30869`/`30877`, Ciudad Real `30971`/`30979`, Guadalajara `31034`/`31042`, Salamanca `31178`/`31186`, Segovia `31196`/`31204`, Toledo `31241`/`31249`, Valladolid `31259`/`31267`.
 
+## Ranking de huecos especiales
+
+Botón **⭐ Ranking de huecos especiales** (panel izquierdo). Barre **las 2.580 zonas** (21 distritos + 2.559 municipios) buscando el mejor hueco especial de cada una y las ordena **de más a menos gente en la zona de 3 minutos**, que es el mercado de proximidad real. Tarda ~5 s la primera vez y queda cacheado.
+
+Salen **45 zonas** en 8 regiones. Filtros por región y por si el municipio tiene o no supermercado. Al pulsar una fila, la app salta a esa zona (cambiando de región si hace falta) y la pinta en el mapa.
+
+Los municipios **sin ninguna tienda** del censo también entran: se evalúa su centro con la competencia de los pueblos vecinos, igual que hace el mapa.
+
+## Por qué una zona puede salir "BAJO" y tener un hueco
+
+**39 de las 45 zonas con hueco especial puntúan BAJO**, así que no es un caso raro: es lo normal, y sin explicarlo el informe se contradice a ojos del lector.
+
+No es un error. Son **dos preguntas distintas**:
+- El **índice** valora **todo el municipio** como mercado: población, renta, saturación, alquiler. Pozuelo de Alarcón saca 20 porque es caro y de renta alta — mal mercado para un súper de descuento.
+- El **hueco especial** valora **un punto concreto**: si ahí hay bastante gente y poca competencia.
+
+Un municipio caro puede ser mal mercado global y tener aun así un bolsillo sin cubrir. Cuando ambas cosas coinciden, el detalle de la zona añade un aviso **"⭐ Matiz importante"** explicándolo, y el ranking lleva la misma nota al pie.
+
 ## Ventas de las tiendas: tres niveles
 
 El censo trae ventas **solo para 862 de las 5.908 tiendas** (15%), y de vintages muy distintos (DIA 2011-2012, Carrefour 2018/2019, Supercor feb-2021, Eroski mensual). El resto se rellena con el fichero **"Datos Nielsen"** (24.971 tiendas con rótulo, dirección, CP, código INE, m² y venta anual de alimentación), en dos escalones:

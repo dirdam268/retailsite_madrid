@@ -1,4 +1,4 @@
-const CACHE_NAME = 'retailsite-madrid-v10';
+const CACHE_NAME = 'retailsite-madrid-v11';
 const PRECACHE = [
   './',
   './index.html',
