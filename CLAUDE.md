@@ -94,17 +94,24 @@ El algoritmo actual en `detectGaps(stores)`:
 
 ### Score de viabilidad (`calcScore`)
 
-Devuelve `{total, hab_s, renta_s, paro_s, sat_s, ratio_s, alq_s, totalComps, m2_abiertos, habPerComp, m2PerHab, alq_grande}`. Ponderaciones actuales:
+**EL CRITERIO DEL NEGOCIO ES: mucha gente, con dinero, y pocos competidores.** No es un súper de descuento. Ponderaciones actuales:
 ```
-sat_s     × 0.28
-ratio_s   × 0.18   (hab/tienda)
-hab_s     × 0.18   (densidad poblacional)
-alq_s     × 0.16
-(100-renta_s) × 0.10   (renta inversa: rentas bajas ⇒ más necesidad de súper barato; usa la renta real por persona del entorno 2 km, INE secciones 2023 — ver computeRentaEntorno / d.rentaEntorno)
-paro_s    × 0.10
+sat_s     × 0.28   (mercado libre: menos m²/hab = mejor)
+renta_s   × 0.25   (DIRECTA: más renta = mejor. Usa la renta real por persona del
+                    entorno 2 km, INE secciones 2023 — ver computeRentaEntorno)
+hab_s     × 0.22   (densidad poblacional)
+ratio_s   × 0.20   (hab/tienda)
+paro_s    × 0.05   (INVERTIDO: menos paro = mejor, es poder adquisitivo)
 ```
 
-**REGLA GENERAL: un factor sin dato se excluye y su peso se reparte.** `calcScore` construye la lista `comps` de pares `[valor, peso]`, descarta los de valor `null`/`NaN` y divide por la suma de los pesos presentes. Con los 6 factores el resultado es idéntico al de siempre (verificado: los 21 distritos de Madrid no cambian ni un punto). Nunca rellenar un hueco con 0 o con un valor por defecto: un `renta:0` daría el MÁXIMO de "renta inversa" y un `paro:-1` contaminaría el score.
+**Dos direcciones que estuvieron mal y NO hay que revertir** (ago-2026, corregido a petición del usuario):
+- La renta iba **invertida** (rentas bajas puntuaban más). Premiaba los barrios pobres y hundía los ricos: Barrio de Salamanca era el PEOR distrito de Madrid con 18. Ahora va directa.
+- El paro sumaba en positivo (más paro = mejor). Ahora va invertido.
+- **El alquiler ya NO puntúa** (pesaba 0.16). Textualmente: *"que sea caro será un problema mío para buscar alquileres, solo me das la info, no lo discrimines"*. `alq_s` se sigue calculando y mostrando como información, pero no entra en `comps`.
+
+**MASA CRÍTICA: `MIN_HAB_MUNICIPIO = 3000`, `state.soloMasaCritica` activo por defecto.** Sin este filtro el ranking lo copaban aldeas (46 de los 50 primeros con <3.000 hab): un pueblo de 160 personas sin ninguna tienda marca `sat_s = 100` ("100% mercado libre") cuando lo que pasa es que no hay mercado. **El 3.000 no es inventado: es el umbral que fijan los propios criterios de expansión para un municipio** (el mismo que usa el hueco especial). Es un interruptor visible y reversible bajo los filtros, no un cambio oculto en el score.
+
+**REGLA GENERAL: un factor sin dato se excluye y su peso se reparte.** `calcScore` construye la lista `comps` de pares `[valor, peso]`, descarta los de valor `null`/`NaN` y divide por la suma de los pesos presentes. Nunca rellenar un hueco con 0 o con un valor por defecto: un `paro:-1` contaminaría el score.
 
 **Los valores centinela (-1, 0) NO deben salir de los scripts de PowerShell al JSON.** Se emiten como `$null`. Este bug llegó a publicarse con Cantabria (Tresviso salió con `paro:-1` y `renta:0`).
 

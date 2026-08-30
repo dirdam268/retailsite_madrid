@@ -27,6 +27,24 @@ Las siete últimas son **provincias sueltas, no comunidades enteras**. En el sel
 
 **Fuentes de las 7 provincias** (idénticas en todas): censo 2024; población, % 65+ y % <18 del INE (Atlas, **una tabla de demografía por provincia**, 2023); renta por persona y por hogar (Atlas ADRH, **una tabla por provincia**, 2023); paro registrado del SEPE (enero 2026); estudios del Censo INE 2021-2024. Tablas del INE (renta/demografía): Ávila `30869`/`30877`, Ciudad Real `30971`/`30979`, Guadalajara `31034`/`31042`, Salamanca `31178`/`31186`, Segovia `31196`/`31204`, Toledo `31241`/`31249`, Valladolid `31259`/`31267`.
 
+## El índice: qué premia (y qué ya NO penaliza)
+
+El índice busca **mucha gente, con dinero y pocos competidores**:
+
+| Peso | Factor | Dirección |
+|---|---|---|
+| 28% | Mercado libre (saturación) | menos m²/hab = mejor |
+| 25% | **Renta del entorno** | **más renta = mejor** |
+| 22% | Densidad de población | más gente = mejor |
+| 20% | Habitantes por tienda | más gente por tienda = mejor |
+| 5% | Paro | **menos paro = mejor** |
+
+**El alquiler ya no puntúa.** Un local caro es un coste a negociar local a local, no una razón para descartar la zona: se sigue mostrando el precio, pero no baja el índice. Antes pesaba un 16%.
+
+**La renta ya no va invertida.** El índice original estaba construido para un súper de descuento (renta baja y paro alto = mejor). Eso premiaba los barrios pobres y hundía los ricos, justo al revés del criterio real. Efecto del cambio en los distritos de Madrid: Salamanca 18→40, Centro 16→39, Moncloa-Aravaca 41→59, Chamberí 30→48; y a la baja Villaverde 47→33, Puente de Vallecas 59→48.
+
+**Masa crítica (≥3.000 hab), activada por defecto en municipios.** Sin ella el ranking lo copaban aldeas: 46 de los 50 primeros tenían menos de 3.000 habitantes, porque un pueblo de 160 personas sin ninguna tienda marca "100% mercado libre" cuando lo que ocurre es que no hay mercado. El umbral es el que fijan los propios criterios de expansión para un municipio, no uno inventado. Se puede desactivar con el interruptor bajo los filtros.
+
 ## Ranking de huecos especiales
 
 Botón **⭐ Ranking de huecos especiales** (panel izquierdo). Barre **las 2.580 zonas** (21 distritos + 2.559 municipios) buscando el mejor hueco especial de cada una y las ordena **de más a menos gente en la zona de 3 minutos**, que es el mercado de proximidad real. Tarda ~5 s la primera vez y queda cacheado.
