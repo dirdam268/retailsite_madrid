@@ -45,6 +45,18 @@ El índice busca **mucha gente, con dinero y pocos competidores**:
 
 **Masa crítica (≥3.000 hab), activada por defecto en municipios.** Sin ella el ranking lo copaban aldeas: 46 de los 50 primeros tenían menos de 3.000 habitantes, porque un pueblo de 160 personas sin ninguna tienda marca "100% mercado libre" cuando lo que ocurre es que no hay mercado. El umbral es el que fijan los propios criterios de expansión para un municipio, no uno inventado. Se puede desactivar con el interruptor bajo los filtros.
 
+## Cómo se cuenta la población alrededor de un punto
+
+El INE da la población por **sección censal**, y de cada sección solo tenemos su centroide. Contar la sección entera cuando su centroide cae dentro del radio funciona en ciudad (una sección urbana mide 120-170 m) pero **miente en el campo**, donde una sección abarca kilómetros.
+
+Caso real: un hueco en mitad del monte de El Escorial se apuntaba **4.426 vecinos a 3 minutos** que en realidad vivían en el pueblo, a 2 km. Sus dos secciones tenían 877 m y **2.440 m** de separación entre centroides.
+
+Ahora cada sección se modela como un **disco de radio = la mitad de la distancia a la sección vecina más próxima** (su tamaño real, deducido de los propios datos), con la gente repartida por igual, y solo se cuenta la parte del disco que cae dentro del círculo consultado. En ciudad no cambia nada; en el campo reparte la población como corresponde. Se aplica a los huecos verdes y al hueco especial.
+
+**Además, el punto tiene que estar donde vive la gente**, no solo cerca: se exige que la densidad pegada al punto (500 m) sea al menos **un cuarto** de la densidad media de su área de 3 minutos. Es una comprobación relativa, así que se adapta sola a una ciudad densa o a un pueblo. El ¼ es un umbral propio y ajustable.
+
+Efecto: los huecos especiales pasan de 45 a **34** — desaparecen 11 que estaban en descampado. Los que quedan tienen gente en la puerta: Las Rozas 1.956 vecinos a 500 m, Tolosa 2.229, Ondarroa 1.235.
+
 ## Ranking de huecos especiales
 
 Botón **⭐ Ranking de huecos especiales** (panel izquierdo). Barre **las 2.580 zonas** (21 distritos + 2.559 municipios) buscando el mejor hueco especial de cada una y las ordena **de más a menos gente en la zona de 3 minutos**, que es el mercado de proximidad real. Tarda ~5 s la primera vez y queda cacheado.
