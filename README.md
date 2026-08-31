@@ -59,6 +59,14 @@ La regla se aplica **en los tres sitios** donde se generan huecos: el hueco espe
 
 Efecto: los huecos especiales pasan de 45 a **25**. Auditoría completa tras el cambio: **0 de 1.074 huecos verdes y 0 de 25 especiales caen en descampado**. Los que quedan tienen gente en la puerta: Las Rozas 1.956 vecinos a 500 m, Tolosa 2.229, Ondarroa 1.235.
 
+### Segunda vuelta: en pueblos pequeños no basta con filtrar, hay que elegir bien el punto
+
+Villanueva del Pardillo (5 tiendas) seguía sacando un hueco en mitad de un prado. El filtro de 333 vecinos lo dejaba pasar (contaba 613), porque la sección censal que cubre esa zona **mezcla casco y campo** y el modelo de disco uniforme le presta al prado la densidad del pueblo. El problema de fondo era otro: en municipios con menos de 6 tiendas los dos puntos se colocaban en **dos ángulos fijos** alrededor del centro de las tiendas — geometría ciega, daba igual lo que hubiera debajo.
+
+Ahora esa rama **barre 16 ángulos × 4 distancias (300/450/600/800 m)**, descarta lo que esté pegado a una tienda o por debajo del listón, ordena por vecinos a 500 m y se queda con los dos mejores, separados entre sí. En Villanueva los huecos pasan a tener **1.578 y 1.127 vecinos**, los dos dentro del casco.
+
+Auditoría de esta rama: **343 huecos en 716 municipios**, mínimo 335 vecinos a 500 m (Mendaro). **535 municipios se quedan sin ningún hueco** — que es la respuesta honesta cuando no hay ningún sitio con gente suficiente, en vez de dibujar dos puntos donde toque.
+
 ## Urbano o rural: lo decide la densidad, no el tipo de zona
 
 Los criterios de proximidad distinguen **Urbano** (radios de 900 y 1.600 m) de **Rural** (1.500 y 2.600 m). Hasta ahora eso se traducía como *"distrito de Madrid = urbano, municipio = rural"*, lo cual valía cuando la app solo tenía Madrid pero, con 2.559 municipios, metía a **Bilbao (348.000 hab)** o **Fuenlabrada (190.000)** en el saco rural. En una ciudad densa un círculo de 2.600 m abarca media ciudad —en Fuenlabrada, 143.000 personas y 40 supermercados— y hace **imposible** cumplir los topes de competencia, pensados para un barrio a pie.
@@ -206,6 +214,28 @@ Además de los 5 huecos verdes, en cada distrito/municipio se busca **un "hueco 
 Solo se marca si pasan **ambos bloques**. El popup muestra qué sub-criterios concretos se cumplen (✅/❌) para que sea auditable.
 
 Los tiempos 3/5 min se **aproximan por radio** (no isócronas reales): distrito 900 m / 1,6 km; municipio 1,5 km / 2,6 km. La población es **real**: INE Censo Anual 2023 por sección censal (4.417 secciones de la CAM, geometría INE 2019, unidas por CUSEC; cubre ~97% de la población). Datos embebidos y cifrados en `SECCIONES` dentro de `index-src.html`.
+
+## Hueco Henry (morado)
+
+Tercer tipo de hueco, a partir del caso real de **Fuenlabrada**. El problema: el hueco especial busca zonas mal servidas **en varios kilómetros**, así que en una ciudad grande **no puede saltar nunca** — siempre hay 20 súpers a 1.600 m. Y sin embargo en Fuenlabrada existe un punto con miles de vecinos y **ni un metro de supermercado a 500 m**. Esa bolsa de barrio es lo que marca el hueco Henry.
+
+Condiciones (todas):
+- El punto está en **trama urbana** (≥3.000 hab/km² a 1 km). En un pueblo, "sin tiendas a 500 m" es lo normal y no significa nada.
+- **0 m² de competencia** dentro de 500 m — cero, no "poca".
+- **≥120 m** a la tienda más cercana.
+- **≥7.000 vecinos a 500 m** y **≥2.000 a 250 m**.
+
+Los dos umbrales de población están calibrados con el propio caso de Fuenlabrada (7.677 vecinos a 500 m) para que la señal sea excepcional: salta en **34 de las 906 zonas con tiendas (4%)**. Con 4.000 saltaba en 79, incluidos 20 de los 21 distritos de Madrid — una etiqueta que se lleva todo el mundo no informa de nada. El mínimo a 250 m evita que el marcador se pegue al borde del casco urbano: a 500 m basta con que media circunferencia esté poblada, y el punto acababa mirando al campo.
+
+La competencia se cuenta con **todas** las tiendas del entorno (no solo las del municipio), así que un súper justo al otro lado del límite municipal también descarta el punto.
+
+## Los tres tipos de hueco, en una línea
+
+| | Color | Cuándo sale | Qué mira |
+|---|---|---|---|
+| **Huecos** | 🟢 verde | siempre (hasta 5 por zona) | el mejor hueco relativo dentro de la zona |
+| **Hueco especial** | ⭐ negro | solo si cumple los criterios de expansión | gente **y** poca competencia a 3 y 5 minutos |
+| **Hueco Henry** | 🟣 morado | solo en ciudad densa sin nadie vendiendo a la vuelta de la manzana | los 500 m del punto |
 
 ## Municipios sin supermercado (lista)
 

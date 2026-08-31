@@ -115,6 +115,8 @@ paro_s    × 0.05   (INVERTIDO: menos paro = mejor, es poder adquisitivo)
 
 **Los valores centinela (-1, 0) NO deben salir de los scripts de PowerShell al JSON.** Se emiten como `$null`. Este bug llegó a publicarse con Cantabria (Tresviso salió con `paro:-1` y `renta:0`).
 
+**Consecuencia del punto anterior: `item.renta` puede ser `null`** (14 municipios; el INE no publica renta en los muy pequeños). Seleccionar uno reventaba el panel con `Cannot read properties of null (reading 'toLocaleString')` — la ficha, el modal de la métrica y el PDF lo tratan ya como "Sin dato". Al tocar cualquier plantilla nueva, guardar igual que con `item.paro`.
+
 **Datos marcados como estimación.** `item.paro_estimado === true` (Cantabria y La Rioja) significa que la tasa de paro NO es oficial: se deriva de `parados / población 18-64` porque no existe tasa municipal vigente. La tarjeta pone "(est.)", el detalle muestra un aviso ámbar y el PDF lo dice. No es comparable con la de Madrid. Si en el futuro aparece una tasa oficial, quitar el flag.
 
 **El SEPE censura los recuentos pequeños** escribiendo `"<5"` (privacidad). No es un número: esos municipios van con `paro:null` (74 de 174 en La Rioja) y la UI dice "Sin dato" explicando por qué.
@@ -130,9 +132,27 @@ paro_s    × 0.05   (INVERTIDO: menos paro = mejor, es poder adquisitivo)
 **Hay TRES sitios que generan huecos y los tres necesitan la comprobación** (se me escapó uno en el primer intento y la auditoría lo destapó):
 1. `evalHuecoEspecial` — hueco especial.
 2. `detectGaps`, bucle de candidatos — huecos verdes normales.
-3. `detectGaps`, **rama de `stores.length < 6`** — coloca 2 puntos por GEOMETRÍA pura alrededor del centroide, sin mirar población. Salían huecos a 2 km del pueblo con cero residentes (Villalbilla, Colmenar de Oreja) aunque fueran `lowConfidence`.
+3. `detectGaps`, **rama de `stores.length < 6`** — colocaba 2 puntos por GEOMETRÍA pura alrededor del centroide, sin mirar población. Salían huecos a 2 km del pueblo con cero residentes (Villalbilla, Colmenar de Oreja) aunque fueran `lowConfidence`.
 
 Cuidado también con la guarda: la primera versión eximía el caso `densZona === 0`, y por ahí colaba un hueco en Oñati con **cero habitantes** en todo el radio. Auditoría final: 0 de 1.074 huecos verdes y 0 de 25 especiales en descampado.
+
+**El umbral de 333 no bastaba en la rama de `<6` tiendas: hay que ELEGIR el punto por población, no filtrarlo.** En Villanueva del Pardillo uno de los dos ángulos fijos caía en un prado y aun así pasaba (613 vecinos a 500 m) porque la sección censal que lo cubre mezcla casco y campo, así que el disco uniforme le "presta" la densidad del pueblo. Ahora la rama barre **16 ángulos × 4 radios (300/450/600/800 m)**, descarta los que estén a <150 m de una tienda o bajo el umbral, ordena por población a 500 m y se queda con los 2 mejores separados ≥400 m entre sí. Resultado en Villanueva: 1.578 y 1.127 vecinos, ambos dentro del casco. Auditoría de la rama: 343 huecos en 716 municipios de <6 tiendas, mínimo 335 vecinos a 500 m (Mendaro); 535 municipios se quedan **sin ningún hueco**, que es la respuesta honesta cuando no hay sitio con gente suficiente.
+
+### Los TRES tipos de hueco
+
+| | Color | Cuándo sale | Qué mira |
+|---|---|---|---|
+| **Huecos** | verde | siempre (hasta 5 por zona) | mejor hueco relativo dentro de la zona |
+| **Hueco especial** | negro | solo si cumple los criterios de expansión | gente **y** poca competencia a 3 y 5 min |
+| **Hueco Henry** | morado | solo en ciudad densa sin competencia a la vuelta de la manzana | 500 m alrededor del punto |
+
+**El hueco Henry (ago-2026, pedido por el usuario a partir del caso de Fuenlabrada).** El hueco especial es **estructuralmente imposible** en una ciudad grande: exige poquísima competencia en 1.600-2.600 m y ahí siempre hay 20 súpers. Pero Fuenlabrada tenía un punto con miles de vecinos y **cero metros de súper a 500 m**. Eso es el Henry: `evalHuecoHenry` exige (a) `esTramaUrbana` — en un pueblo "sin tiendas a 500 m" es lo normal y no dice nada; (b) **0 m² de competencia** en 500 m; (c) ≥120 m a la tienda más cercana; (d) **≥7.000 vecinos a 500 m** y **≥2.000 a 250 m**.
+
+Las dos constantes de población están calibradas, no inventadas: 7.000 es el propio caso de Fuenlabrada (7.677) y deja la señal en **34 de las 906 zonas con tiendas (4%)** — con 4.000 saltaba en 79, incluidos 20 de los 21 distritos de Madrid, y una etiqueta que se lleva todo el mundo no informa de nada. El **mínimo a 250 m** es lo que impide que el marcador se pegue al borde del casco: a 500 m basta con que la mitad del círculo esté poblada, y así el punto acababa mirando al campo.
+
+`detectHuecoHenry(stores, isDistrito)` se monta su propio bbox (margen 1.200 m) y usa `getAllStores()`, para que cuente la competencia del municipio o distrito de al lado. Rejilla 29×29, máximo `maxFromZone` (800 m distrito / 1.600 m municipio) de una tienda de la zona para no salirse de la huella urbana.
+
+**La recomendación ejecutiva se pinta ANTES que el mapa.** `renderCenter` llama a `generateRecommendation` y solo después lanza `renderMap` (con `setTimeout`), que es quien calcula `currentSpecialGap` y `currentHenryGap`. Por eso `renderMap` **reescribe `#recomBox`** al terminar. Sin eso la nota del Henry (y la del hueco especial) usa los valores de la zona ANTERIOR.
 
 **Geolocalización: Nominatim a `zoom: 16`, NO 14.** A 14 devuelve a veces un pueblo VECINO: en el centro de Sevilla la Nueva contestaba "Navalagamella", a 13 km, y como Navalagamella existe en nuestros datos el match exacto la daba por buena (el respaldo por cercanía ni se activaba). Comprobado que a 16 acierta el municipio Y sigue dando el distrito en Madrid capital, que era lo único para lo que hacía falta el 14. Zoom 12 y 13 también fallan.
 
