@@ -125,6 +125,8 @@ paro_s    × 0.05   (INVERTIDO: menos paro = mejor, es poder adquisitivo)
 
 **El hueco tiene que estar DONDE VIVE LA GENTE, no solo cerca.** Un punto en el monte de El Escorial cumplía "3.400 hab a 3 min" con CERO vecinos a 300 m. Se exige `p500 >= 3000 × (500/r3)²` — el propio criterio de población repartido por igual: **333 en municipio, 926 en distrito**. No es un número inventado.
 
+**Urbano/Rural lo decide la DENSIDAD del punto (`esTramaUrbana`), no `isDistrito`.** Los criterios distinguen Urbano (radios 900/1.600) de Rural (1.500/2.600). Traducirlo como "distrito de Madrid = urbano" valía con la app solo-Madrid, pero metía a Bilbao (348k) y Fuenlabrada (190k) en el saco rural: un círculo de 2.600 m en ciudad densa abarca 143.000 personas y 40 súpers, y hace IMPOSIBLE cumplir los topes de competencia. Corte en `DENSIDAD_URBANA = 3000` hab/km² medidos a 1 km del punto (datos: pueblos 14-200, distritos Madrid 7.000-10.000, ciudades 17.000-28.000). **Solo cambian los RADIOS**; los umbrales de población de zona (barrio ≥20.000 / pueblo ≥3.000) siguen atados a `isDistrito`, que es propiedad de la unidad administrativa. Desbloqueó Alcobendas y Leganés, antes excluidas estructuralmente.
+
 **Hay TRES sitios que generan huecos y los tres necesitan la comprobación** (se me escapó uno en el primer intento y la auditoría lo destapó):
 1. `evalHuecoEspecial` — hueco especial.
 2. `detectGaps`, bucle de candidatos — huecos verdes normales.

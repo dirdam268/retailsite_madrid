@@ -59,6 +59,14 @@ La regla se aplica **en los tres sitios** donde se generan huecos: el hueco espe
 
 Efecto: los huecos especiales pasan de 45 a **25**. Auditoría completa tras el cambio: **0 de 1.074 huecos verdes y 0 de 25 especiales caen en descampado**. Los que quedan tienen gente en la puerta: Las Rozas 1.956 vecinos a 500 m, Tolosa 2.229, Ondarroa 1.235.
 
+## Urbano o rural: lo decide la densidad, no el tipo de zona
+
+Los criterios de proximidad distinguen **Urbano** (radios de 900 y 1.600 m) de **Rural** (1.500 y 2.600 m). Hasta ahora eso se traducía como *"distrito de Madrid = urbano, municipio = rural"*, lo cual valía cuando la app solo tenía Madrid pero, con 2.559 municipios, metía a **Bilbao (348.000 hab)** o **Fuenlabrada (190.000)** en el saco rural. En una ciudad densa un círculo de 2.600 m abarca media ciudad —en Fuenlabrada, 143.000 personas y 40 supermercados— y hace **imposible** cumplir los topes de competencia, pensados para un barrio a pie.
+
+Ahora se decide por la **densidad medida en el propio punto** (1 km alrededor), con el corte en 3.000 hab/km². Los datos separan los dos mundos con holgura: pueblos 14-200 hab/km², distritos de Madrid 7.000-10.000, ciudades 17.000-28.000.
+
+Efecto: aparecen ciudades que antes estaban **estructuralmente excluidas** — Alcobendas (123.000 hab) y Leganés (196.000).
+
 ## Ranking de huecos especiales
 
 Botón **⭐ Ranking de huecos especiales** (panel izquierdo). Barre **las 2.580 zonas** (21 distritos + 2.559 municipios) buscando el mejor hueco especial de cada una y las ordena **de más a menos gente en la zona de 3 minutos**, que es el mercado de proximidad real. Tarda ~5 s la primera vez y queda cacheado.
