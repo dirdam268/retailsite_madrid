@@ -9,3 +9,6 @@ index-src.html
 data/
 secciones_madrid.json
 socio_madrid.json
+
+# Presentaciones generadas (documentos internos, no van al repo publico)
+*.pptx
