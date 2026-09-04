@@ -75,17 +75,27 @@ Ahora se decide por la **densidad medida en el propio punto** (1 km alrededor), 
 
 Efecto: aparecen ciudades que antes estaban **estructuralmente excluidas** — Alcobendas (123.000 hab) y Leganés (196.000).
 
-## Ranking de huecos especiales
+## Buscar municipios por tipo de hueco
 
-Botón **⭐ Ranking de huecos especiales** (panel izquierdo). Barre **las 2.580 zonas** (21 distritos + 2.559 municipios) buscando el mejor hueco especial de cada una y las ordena **de más a menos gente en la zona de 3 minutos**, que es el mercado de proximidad real. Tarda ~5 s la primera vez y queda cacheado.
+Botón **⭐🟣 Buscar huecos especiales y Henry** (panel izquierdo). Barre **las 2.580 zonas** (21 distritos + 2.559 municipios) buscando el mejor hueco de cada tipo en cada una. Tarda unos 30 segundos la primera vez y queda cacheado el resto de la sesión.
 
-Salen **45 zonas** en 8 regiones. Filtros por región y por si el municipio tiene o no supermercado. Al pulsar una fila, la app salta a esa zona (cambiando de región si hace falta) y la pinta en el mapa.
+Salen **28 huecos especiales** y **35 huecos Henry**. El primer filtro es el **tipo de hueco**: los dos, solo ⭐ especial o solo 🟣 Henry. Después se puede filtrar por región, por si el municipio tiene o no supermercado, y por tamaño. Al pulsar una fila, la app salta a esa zona (cambiando de región si hace falta) y la pinta en el mapa.
 
-Los municipios **sin ninguna tienda** del censo también entran: se evalúa su centro con la competencia de los pueblos vecinos, igual que hace el mapa.
+**La cifra de cada fila no es la misma medida en los dos tipos**, y la app lo dice: el especial cuenta la **gente a 3 minutos** y el Henry los **vecinos a 500 m**. Cada fila lleva su etiqueta, y en el modo "los dos" se avisa de que el orden mezclado es orientativo. Dentro de un mismo tipo el orden sí es una comparación limpia.
+
+Los municipios **sin ninguna tienda** del censo entran en el ranking de huecos especiales: se evalúa su centro con la competencia de los pueblos vecinos, igual que hace el mapa. En el de Henry no, porque el Henry se define como "aquí no vende nadie *aunque la ciudad esté surtida*" — una zona sin ninguna tienda es justo el caso del especial.
+
+### El barrido tardaba casi dos minutos
+
+Este README decía "~5 s", una cifra de cuando la app era solo Madrid que nunca se volvió a medir. Con 12 regiones el barrido real costaba 73 s el especial y 36 s el Henry. Tres cambios lo dejan en ~21 s + 8 s, **sin cambiar ni un resultado** (mismos 28 y 35 huecos, con las mismas cifras):
+
+1. **Descartar antes de calcular.** Lo caro no es recorrer las listas, es la trigonometría de la distancia. Dos restas de grados descartan la inmensa mayoría de secciones antes de calcular nada.
+2. **Una banda por fila.** Los puntos de una misma fila de la rejilla comparten latitud, así que las secciones que pueden afectarles se calculan una vez por fila y no punto a punto.
+3. **Un solo recorrido por punto.** Antes se medía la distancia a las mismas secciones tres veces (para la densidad urbana, para las zonas de 3 y 5 minutos, y para los vecinos a 500 m). Ahora se mide una vez y se reutiliza.
 
 ## Por qué una zona puede salir "BAJO" y tener un hueco
 
-**39 de las 45 zonas con hueco especial puntúan BAJO**, así que no es un caso raro: es lo normal, y sin explicarlo el informe se contradice a ojos del lector.
+**24 de las 28 zonas con hueco especial, y 31 de las 35 con hueco Henry, puntúan BAJO**, así que no es un caso raro: es lo normal, y sin explicarlo el informe se contradice a ojos del lector.
 
 No es un error. Son **dos preguntas distintas**:
 - El **índice** valora **todo el municipio** como mercado: población, renta, saturación, alquiler. Pozuelo de Alarcón saca 20 porque es caro y de renta alta — mal mercado para un súper de descuento.
