@@ -121,6 +121,20 @@ Este README decía "~5 s", una cifra de cuando la app era solo Madrid que nunca 
 2. **Una banda por fila.** Los puntos de una misma fila de la rejilla comparten latitud, así que las secciones que pueden afectarles se calculan una vez por fila y no punto a punto.
 3. **Un solo recorrido por punto.** Antes se medía la distancia a las mismas secciones tres veces (para la densidad urbana, para las zonas de 3 y 5 minutos, y para los vecinos a 500 m). Ahora se mide una vez y se reutiliza.
 
+## Popups con "Cómo llegar" y "Street View" (como en cifra de ventas)
+
+Todos los marcadores del mapa llevan los **mismos dos botones que el popup de tiendas de la app de cifra de ventas**: **🧭 Cómo llegar** (ruta de Google Maps hasta el punto) y **👁 Street View**. Están en las tiendas de la competencia, los huecos verdes, el hueco especial, el hueco Henry y el aviso de municipio sin tiendas. En los huecos hay además un botón **📋 Copiar** que deja `lat, lon` en el portapapeles.
+
+## Resumen de huecos de una zona (al pulsar "Habitantes")
+
+Al pulsar la tarjeta de **Habitantes** de una zona aparece, debajo de la fuente del dato, el apartado **🎯 Huecos de esta zona** con cada hueco (verdes, especial y Henry):
+- sus **coordenadas** en el formato `40.29400, -3.80782`, que es el que **reconoce el buscador de la herramienta de cifra de ventas** (se comprobó contra su `parseCoords`): se pega tal cual y va directo al punto;
+- la **calle** del punto, buscada en OpenStreetMap (Nominatim, 1 petición por segundo, así que van apareciendo de una en una);
+- la gente que hay alrededor y los mismos botones de Cómo llegar y Street View;
+- **📋 Copiar todos (con calle)**: una línea por hueco, `nombre | coordenadas | calle | gente`.
+
+**Qué NO es la "calle".** Es la calle **más cercana al punto óptimo** que calcula la herramienta, no una calle elegida entre varias posibles ni evaluada por paso de gente. Si el punto cae en una plaza o un solar sin nombre sale vacía y se da la tienda más cercana como referencia. Y ningún punto garantiza que haya un local libre ni su precio.
+
 ## Por qué una zona puede salir "BAJO" y tener un hueco
 
 **11 de las 14 zonas con hueco especial, y 29 de las 32 con hueco Henry, puntúan BAJO**, así que no es un caso raro: es lo normal, y sin explicarlo el informe se contradice a ojos del lector.

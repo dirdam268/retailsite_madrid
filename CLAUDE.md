@@ -158,6 +158,15 @@ Lo que arregló el problema. Celdas de 0,001° (~100 m) de "aquí hay ciudad", g
 - Los puntos de control los etiquetó una sola persona y el 40 % se eligió con ellos: es **regresión, no validación independiente.**
 - Cada vez que se cambie un criterio de huecos, **mirar los puntos en satélite** (mosaico de 6 mapas Esri con la máscara dibujada) además de pasar el test.
 
+### Popups con enlaces de mapa y resumen de huecos (pedido del usuario, oct-2026)
+
+- `enlacesMapaHtml(lat, lon, conCopiar)` pone **los mismos dos botones que el popup de tiendas de cifra de ventas**: `https://www.google.com/maps/dir/?api=1&destination=lat,lon` y `https://www.google.com/maps?layer=c&cbll=lat,lon`. Está en los 5 popups (tiendas, verdes, especial, Henry, municipio sin tiendas). `copiarTexto()` usa `navigator.clipboard` y cae al truco del `textarea` si el contexto no es seguro.
+- **Formato de coordenadas = `coordsTexto()` → `40.29400, -3.80782`** (punto decimal, coma y espacio). Es lo que lee `parseCoords` del buscador de cifra de ventas (su 2º patrón). No cambiarlo a coma decimal.
+- **El resumen cuelga de la tarjeta "Habitantes"** (`showMetricInfo('hab')` → `resumenHuecosHtml()` → `resolverCallesResumen()`). Usa `currentGaps`, `currentSpecialGap` y `currentHenryGap`, que **pertenecen a la zona del último `renderMap`**: `_zonaDelMapa` guarda de qué zona son y `huecosDeLaZona()` devuelve `null` si no coinciden (sin eso enseñaría los de la zona anterior). Los huecos verdes no llevan `pob500` salvo los de la rama de <6 tiendas: para ellos se muestra `poblacionCercana` a `radioPoblacion` m.
+- **"La calle más óptima" NO se evalúa**: es el reverse geocoding (`reverseGeocode`, Nominatim) del punto óptimo, o sea la calle más cercana a él. Decirlo siempre así; no vender esa calle como "la mejor calle". Respetar 1 petición/s (cacheado en `addrCache`) y cortar el bucle al cerrar el modal (`_resumenHuecos = []` en `closeMetricModal`).
+- Cubierto en `test_huecos.html` (prueba 5) y **comprobado con mutación**: quitando los botones de las tiendas y rompiendo el resumen, fallan justo esas dos pruebas.
+- **Ojo con el caché**: el usuario reportó "siguen apareciendo huecos en el campo (Seseña)" mientras seguía publicada la versión anterior. Antes de investigar un fallo que parece ya arreglado, **comprobar que lo desplegado es lo último** (`index.html` local vs publicado, y subir `CACHE_NAME` en `sw.js`).
+
 ### Trampas de PowerShell que costaron tiempo aquí
 - `Start-Process -ArgumentList @(...)` **no entrecomilla**: con una ruta con espacios (`OneDrive - ESIC`) powershell recibía `-File 'C:\Users\Usuario\OneDrive'` y salía sin arrancar nada. Escapar: `"`"$ruta`""`.
 - Los nombres de variable **no distinguen mayúsculas**: `$T = 0.2` lo pisaba `$t` del bucle (error "no se puede convertir '191,-22' a Double"). Y `[double]$p[0]` hace el cast sobre el **array**, no sobre el elemento.
