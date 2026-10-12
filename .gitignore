@@ -12,3 +12,6 @@ socio_madrid.json
 
 # Presentaciones generadas (documentos internos, no van al repo publico)
 *.pptx
+
+# Herramientas para regenerar la mascara de casco urbano desde OpenStreetMap (rutas locales)
+herramientas_osm/

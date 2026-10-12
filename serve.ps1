@@ -38,8 +38,12 @@ while ($listener.IsListening) {
       $res.OutputStream.Write($msg, 0, $msg.Length)
     }
   } catch {
-    $res.StatusCode = 500
+    try { $res.StatusCode = 500 } catch { }
   } finally {
-    $res.OutputStream.Close()
+    # Si el navegador corta la conexion a mitad (navegar a otra pagina, cerrar la
+    # pestana, una peticion cancelada), Close() lanza "conexion de red inexistente".
+    # Sin este try/catch esa excepcion mataba el bucle y el servidor dejaba de
+    # responder a la siguiente peticion, sin avisar.
+    try { $res.OutputStream.Close() } catch { }
   }
 }

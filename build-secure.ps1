@@ -1,11 +1,23 @@
 param(
   [Parameter(Mandatory=$true)][string]$Password,
   [string]$Src = "index-src.html",
-  [string]$Out = "index.html"
+  [string]$Out = "index.html",
+  [switch]$SinTests
 )
 $ErrorActionPreference = 'Stop'
 $dir = $PSScriptRoot
 $srcPath = Join-Path $dir $Src
+
+# 0) Antes de cifrar y publicar: que los huecos que genera la app caigan en ciudad.
+#    Existe porque una auditoria que no podia fallar dio "0 huecos en descampado" cuando
+#    eran 22 de 27. Tarda ~2 min. Si falla, NO se genera index.html.
+#    -SinTests lo salta (solo para cambios que no tocan huecos, y dejandolo dicho).
+$probar = Join-Path $dir 'herramientas_osm\probar.ps1'
+if (-not $SinTests -and $Src -eq 'index-src.html' -and (Test-Path $probar)) {
+  Write-Host "Probando que los huecos caen en ciudad (unos 2 min)..." -ForegroundColor Cyan
+  & powershell -ExecutionPolicy Bypass -File $probar
+  if ($LASTEXITCODE -ne 0) { throw "Los tests de huecos han fallado: no se genera $Out. Arreglalo, o usa -SinTests si el cambio no toca huecos." }
+}
 
 # 1) Leer la app en claro y anteponer un sello para verificar el descifrado
 $plainBytes = [System.IO.File]::ReadAllBytes($srcPath)

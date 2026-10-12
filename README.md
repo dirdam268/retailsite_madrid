@@ -57,7 +57,35 @@ Ahora cada sección se modela como un **disco de radio = la mitad de la distanci
 
 La regla se aplica **en los tres sitios** donde se generan huecos: el hueco especial, los huecos verdes normales, y los puntos geométricos que se colocan en municipios con menos de 6 tiendas (que antes no miraban la población en absoluto y podían caer a 2 km del pueblo, con cero residentes — Villalbilla, Colmenar de Oreja).
 
-Efecto: los huecos especiales pasan de 45 a **25**. Auditoría completa tras el cambio: **0 de 1.074 huecos verdes y 0 de 25 especiales caen en descampado**. Los que quedan tienen gente en la puerta: Las Rozas 1.956 vecinos a 500 m, Tolosa 2.229, Ondarroa 1.235.
+Efecto: los huecos especiales pasan de 45 a **25**.
+
+> **Corrección (oct-2026): esta sección declaraba "0 de 1.074 huecos verdes y 0 de 25 especiales caen en descampado" y era FALSO.** La auditoría comprobaba que cada hueco tuviera ≥333 vecinos a 500 m, que es exactamente la condición que el código ya imponía: no podía fallar. Mirando los huecos en satélite, **22 de 27 especiales caían en campo, bosque, agua o polígono industrial** (Las Rozas junto a la M-50, Piélagos en un prado, Tolosa en un polígono, Marina de Cudeyo en un embalse…). Los 1.956 vecinos de Las Rozas y los 2.229 de Tolosa eran población *modelada*, no gente que viva en ese punto. La solución real está en la sección siguiente.
+
+## El hueco tiene que caer en ciudad: máscara de casco urbano (OpenStreetMap)
+
+**El problema de fondo.** Con centroides de sección censal y coordenadas de tiendas **no se puede saber si un punto está edificado**. El reparto por discos le presta a un prado la población del pueblo de al lado, y el buscador empuja hacia el vacío porque ahí no hay competencia. Se midió: la mediana de población modelada a 150 m de los 5.902 supermercados reales es de 316 personas, pero **el percentil 25 es 3**. Una cuarta parte de las tiendas que existen y funcionan tienen "casi cero" vecinos al lado según el modelo, así que ningún umbral de población puede separar ciudad de campo.
+
+**Qué se hizo.** Se descargaron de OpenStreetMap (extractos de Geofabrik de las 7 comunidades) las calles residenciales, los edificios y los usos del suelo, y se convirtieron en una **máscara de celdas de ~100 m** embebida en la app (204 KB). Un punto es *casco* si al menos el **70 %** de las celdas a 150 m tienen calle residencial o edificio, y la celda no es suelo industrial. Los tres generadores de huecos —el especial, el Henry y los verdes (incluida la rama de municipios con pocas tiendas)— **solo aceptan puntos dentro del casco**.
+
+**Un segundo requisito, aprendido mirando casos.** Que la *celda* sea casco no basta: un punto en el borde de una celda urbana puede tener medio círculo de bosque (Tolosa 0,14; Boadilla del Monte 0,30). Se exige además que **al menos el 40 % del círculo de 150 m sea casco**. Los dos malos claros quedan en ≤ 0,30 y el resto de huecos válidos en ≥ 0,44: el margen es estrecho (pocos puntos), así que es un umbral razonable y no una frontera demostrada.
+
+**Resultado.** Huecos especiales **28 → 14** y Henry **35 → 32**. Los 14 especiales: Madrid 7, Cantabria 4, País Vasco 1, Salamanca 1, Toledo 1. De ellos, **11 de 14 especiales y 29 de 32 Henry puntúan BAJO** en el índice (ver más abajo).
+
+**Cómo se comprobó que ahora sí funciona.**
+- Un conjunto de **86 puntos revisados a ojo en satélite** (`herramientas_osm/puntos_control.csv`): 31 *malos* (campo, bosque, agua, polígono), 36 *buenos* (ciudad confirmada) y 19 *dudosos* que se informan pero no se exigen.
+- **Ningún malo pasa el veto y todos los buenos pasan.** Dos buenos antiguos (puntos dentro de parques en Moratalaz y Villa de Vallecas) quedan vetados y se aceptan: la máscara los descarta, y es preferible a un hueco dentro de un parque.
+- Tres invariantes sobre **todo lo que genera la app**: cada hueco especial, Henry y verde (1.155 en 904 zonas) cae en casco.
+- **El test se probó haciéndole fallar a propósito** (mutación): quitando el veto entero falla en los 31 puntos malos; quitándolo solo del Henry señala exactamente las 7 zonas donde se volvería a colar. Con el veto roto el test de "hay N huecos" **no** lo detecta (27 y 36 caen en rangos plausibles), por eso la prueba que importa es la de los puntos de control.
+
+**Limitaciones que hay que decir.**
+- Los puntos de control los etiquetó **una sola persona** mirando satélite, y el umbral del 40 % se eligió con esos mismos puntos. Es un test de regresión, no una validación independiente.
+- La máscara depende de que OSM esté bien mapeado. Hay pueblos pequeños con las calles sin etiquetar como residenciales; ahí la máscara es parcial y los huecos desaparecen (**558 de los 714 municipios con menos de 6 tiendas se quedan sin ningún hueco**, y 13 de los 169 con 6 o más; es la respuesta honesta cuando no hay sitio comprobable, pero conviene saber que en pueblos pequeños la herramienta ahora casi nunca propone nada).
+- Los 4 núcleos rurales de Cantabria que siguen saliendo (Marina de Cudeyo, Santillana del Mar, Villaescusa, Nuevo Baztán) son casas dispersas: están en casco por la regla, pero son los más discutibles.
+- El punto del Henry de Logroño cae dentro de un complejo institucional: los vecinos son reales, pero ese punto exacto no es un solar.
+
+**Regenerar la máscara** (si cambia OSM o se añade una región): `herramientas_osm/` contiene los scripts (`rejilla.ps1` → `build_casco.ps1`, que inyecta `const CASCO_RLE`). Hace falta bajar los `.shp.zip` de Geofabrik (~1,3 GB). **Overpass no sirve para esto**: bloquea las peticiones de PowerShell (406) y limita el ritmo (~20 s por tile y 389 tiles).
+
+**Probar antes de publicar.** `build-secure.ps1` ejecuta ahora `herramientas_osm/probar.ps1` (Edge sin ventana, ~2 min) y **no genera `index.html` si algo falla**. `-SinTests` lo salta, solo para cambios que no tocan huecos.
 
 ### Segunda vuelta: en pueblos pequeños no basta con filtrar, hay que elegir bien el punto
 
@@ -79,7 +107,7 @@ Efecto: aparecen ciudades que antes estaban **estructuralmente excluidas** — A
 
 Botón **⭐🟣 Buscar huecos especiales y Henry** (panel izquierdo). Barre **las 2.580 zonas** (21 distritos + 2.559 municipios) buscando el mejor hueco de cada tipo en cada una. Tarda unos 30 segundos la primera vez y queda cacheado el resto de la sesión.
 
-Salen **28 huecos especiales** y **35 huecos Henry**. El primer filtro es el **tipo de hueco**: los dos, solo ⭐ especial o solo 🟣 Henry. Después se puede filtrar por región, por si el municipio tiene o no supermercado, y por tamaño. Al pulsar una fila, la app salta a esa zona (cambiando de región si hace falta) y la pinta en el mapa.
+Salen **14 huecos especiales** y **32 huecos Henry** (con la máscara de casco urbano; antes 28 y 35). El primer filtro es el **tipo de hueco**: los dos, solo ⭐ especial o solo 🟣 Henry. Después se puede filtrar por región, por si el municipio tiene o no supermercado, y por tamaño. Al pulsar una fila, la app salta a esa zona (cambiando de región si hace falta) y la pinta en el mapa.
 
 **La cifra de cada fila no es la misma medida en los dos tipos**, y la app lo dice: el especial cuenta la **gente a 3 minutos** y el Henry los **vecinos a 500 m**. Cada fila lleva su etiqueta, y en el modo "los dos" se avisa de que el orden mezclado es orientativo. Dentro de un mismo tipo el orden sí es una comparación limpia.
 
@@ -95,7 +123,7 @@ Este README decía "~5 s", una cifra de cuando la app era solo Madrid que nunca 
 
 ## Por qué una zona puede salir "BAJO" y tener un hueco
 
-**24 de las 28 zonas con hueco especial, y 31 de las 35 con hueco Henry, puntúan BAJO**, así que no es un caso raro: es lo normal, y sin explicarlo el informe se contradice a ojos del lector.
+**11 de las 14 zonas con hueco especial, y 29 de las 32 con hueco Henry, puntúan BAJO**, así que no es un caso raro: es lo normal, y sin explicarlo el informe se contradice a ojos del lector.
 
 No es un error. Son **dos preguntas distintas**:
 - El **índice** valora **todo el municipio** como mercado: población, renta, saturación, alquiler. Pozuelo de Alarcón saca 20 porque es caro y de renta alta — mal mercado para un súper de descuento.
@@ -235,7 +263,7 @@ Condiciones (todas):
 - **≥120 m** a la tienda más cercana.
 - **≥7.000 vecinos a 500 m** y **≥2.000 a 250 m**.
 
-Los dos umbrales de población están calibrados con el propio caso de Fuenlabrada (7.677 vecinos a 500 m) para que la señal sea excepcional: salta en **34 de las 906 zonas con tiendas (4%)**. Con 4.000 saltaba en 79, incluidos 20 de los 21 distritos de Madrid — una etiqueta que se lleva todo el mundo no informa de nada. El mínimo a 250 m evita que el marcador se pegue al borde del casco urbano: a 500 m basta con que media circunferencia esté poblada, y el punto acababa mirando al campo.
+Los dos umbrales de población están calibrados con el propio caso de Fuenlabrada (7.677 vecinos a 500 m) para que la señal sea excepcional: salta en **32 de las 906 zonas con tiendas (3,5%)** (eran 34 antes de la máscara de casco urbano; Fuenlabrada, el caso fundacional, conserva su Henry pero **en otro punto**: el original quedaba en el borde, con media circunferencia de campo). Con 4.000 saltaba en 79, incluidos 20 de los 21 distritos de Madrid — una etiqueta que se lleva todo el mundo no informa de nada. El mínimo a 250 m evita que el marcador se pegue al borde del casco urbano: a 500 m basta con que media circunferencia esté poblada, y el punto acababa mirando al campo.
 
 La competencia se cuenta con **todas** las tiendas del entorno (no solo las del municipio), así que un súper justo al otro lado del límite municipal también descarta el punto.
 
