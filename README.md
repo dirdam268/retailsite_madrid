@@ -125,6 +125,12 @@ Este README decía "~5 s", una cifra de cuando la app era solo Madrid que nunca 
 
 Todos los marcadores del mapa llevan los **mismos dos botones que el popup de tiendas de la app de cifra de ventas**: **🧭 Cómo llegar** (ruta de Google Maps hasta el punto) y **👁 Street View**. Están en las tiendas de la competencia, los huecos verdes, el hueco especial, el hueco Henry y el aviso de municipio sin tiendas. En los huecos hay además un botón **📋 Copiar** que deja `lat, lon` en el portapapeles.
 
+## Mapa a pantalla completa en otra pestaña
+
+Botón **⤢ Pantalla completa** en los controles del mapa. Abre la misma app en una **pestaña nueva** donde el mapa ocupa **toda la pantalla** (pensado para el teléfono, donde el mapa de la ficha se ve pequeño). La pestaña llega con la zona, el **zoom y el centro exactos** que tenías y el tipo de mapa (satélite o calles); arriba quedan los botones de siempre y un **✕ Cerrar**, y abajo la leyenda. Se puede cambiar entre Satélite y Calles sin perder el encuadre (antes volvía a encuadrar toda la zona). Los popups de los huecos, que son altos, dejan margen para no quedar tapados por los botones y se desplazan por dentro si no caben; en pantallas estrechas se ocultan los botones +/− (se hace zoom con los dedos) porque tapaban el título del popup.
+
+Como la contraseña queda recordada en el dispositivo, la pestaña nueva entra sola. La URL es `?mapa=region|pestaña|zona&v=lat,lon,zoom&b=sat|street`, así que **también se puede compartir o guardar como acceso directo**.
+
 ## Resumen de huecos de una zona (al pulsar "Habitantes")
 
 Al pulsar la tarjeta de **Habitantes** de una zona aparece, debajo de la fuente del dato, el apartado **🎯 Huecos de esta zona** con cada hueco (verdes, especial y Henry):
